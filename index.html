@@ -3,400 +3,479 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-<title>CTRL — Remote Controller</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
+<meta name="screen-orientation" content="landscape"/>
+<title>CTRL</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Orbitron:wght@800;900&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    --bg:#0a0a0f; --panel:#12121a; --border:#1e1e30;
-    --accent:#00f5a0; --accent2:#00b4d8; --danger:#ff2d55;
-    --text:#e0e0ff; --muted:#555577; --btn-bg:#1a1a2e;
-    --glow:0 0 18px rgba(0,245,160,.45);
-    --glow2:0 0 18px rgba(0,180,216,.45);
+    --bg:     #07080d;
+    --panel:  #0e1018;
+    --border: #1c1f2e;
+    --accent: #e8ff00;
+    --red:    #ff3b3b;
+    --blue:   #00c8ff;
+    --text:   #c8cfe8;
+    --muted:  #40485a;
+    --btn:    #131620;
+    --glow-y: 0 0 16px rgba(232,255,0,.5);
+    --glow-r: 0 0 20px rgba(255,59,59,.6);
+    --glow-b: 0 0 16px rgba(0,200,255,.4);
   }
-  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;
-    min-height:100dvh;display:flex;flex-direction:column;align-items:center;
-    justify-content:center;overflow:hidden;position:relative}
-  body::before{content:'';position:fixed;inset:0;
-    background-image:linear-gradient(rgba(0,245,160,.03) 1px,transparent 1px),
-      linear-gradient(90deg,rgba(0,245,160,.03) 1px,transparent 1px);
-    background-size:40px 40px;pointer-events:none;z-index:0}
-  body::after{content:'';position:fixed;inset:0;
-    background:repeating-linear-gradient(0deg,transparent,transparent 2px,
-      rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);
-    pointer-events:none;z-index:0}
 
-  .screen{display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:22px;padding:32px 24px;z-index:1;text-align:center;animation:fi .5s ease;width:100%}
-  @keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
-  .logo{font-family:'Orbitron',sans-serif;font-size:2.8rem;font-weight:900;
-    letter-spacing:.18em;color:var(--accent);text-shadow:var(--glow)}
-  .logo span{color:var(--accent2);text-shadow:var(--glow2)}
-  .stitle{font-family:'Orbitron',sans-serif;font-size:.92rem;letter-spacing:.14em;opacity:.85}
-  .ssub{font-size:.73rem;color:var(--muted);line-height:1.8;max-width:310px}
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    touch-action: none;
+  }
 
-  .cta{background:transparent;border:2px solid var(--accent);color:var(--accent);
-    font-family:'Orbitron',sans-serif;font-size:.8rem;letter-spacing:.15em;
-    padding:13px 34px;cursor:pointer;position:relative;overflow:hidden;
-    transition:color .2s,box-shadow .2s;
-    clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
-  .cta::before{content:'';position:absolute;inset:0;background:var(--accent);
-    transform:scaleX(0);transform-origin:left;transition:transform .25s ease;z-index:-1}
-  .cta:hover{color:#000;box-shadow:var(--glow)}.cta:hover::before{transform:scaleX(1)}
-  .cta:active{transform:scale(.96)}.cta:disabled{opacity:.35;cursor:not-allowed}
+  /* Force landscape */
+  @media (orientation: portrait) {
+    #rotateMsg  { display: flex !important; }
+    #app        { display: none !important; }
+  }
 
-  .spinner{width:52px;height:52px;border:3px solid var(--accent2);
-    border-top-color:transparent;border-radius:50%;
-    animation:spin 1s linear infinite;box-shadow:var(--glow2)}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .pulse-row{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.7rem}
-  .pdot{width:9px;height:9px;border-radius:50%;background:var(--accent);
-    box-shadow:var(--glow);animation:pulse 1.2s infinite}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.55)}}
+  /* Rotate nudge */
+  #rotateMsg {
+    display: none;
+    position: fixed; inset: 0; z-index: 999;
+    background: var(--bg);
+    flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 20px;
+    text-align: center;
+  }
+  #rotateMsg svg { width: 64px; height: 64px; fill: var(--accent); animation: tilt 1.4s ease-in-out infinite; }
+  @keyframes tilt {
+    0%,100% { transform: rotate(-15deg); }
+    50%      { transform: rotate(15deg); }
+  }
+  #rotateMsg p { font-family:'Orbitron',sans-serif; font-size:.9rem; letter-spacing:.15em; color:var(--accent); }
 
-  /* Setup */
-  .field{display:flex;flex-direction:column;gap:7px;width:100%;max-width:340px}
-  .field label{font-size:.61rem;color:var(--muted);letter-spacing:.1em}
-  .field input,.field select{background:var(--panel);border:1.5px solid var(--border);
-    color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.76rem;
-    padding:10px 13px;width:100%;outline:none;transition:border-color .2s;
-    -webkit-appearance:none}
-  .field input:focus,.field select:focus{border-color:var(--accent)}
-  .hint{font-size:.59rem;color:var(--muted);line-height:1.8;max-width:320px;text-align:left}
-  .hint a{color:var(--accent2)}.hint b{color:var(--text)}
-  .hint code{background:var(--panel);padding:2px 6px;border:1px solid var(--border);
-    font-size:.57rem;word-break:break-all;display:inline-block;margin:2px 0}
-  .err{color:var(--danger);font-size:.7rem;min-height:1em}
+  /* ── APP SHELL ─────────────────────────────────────── */
+  #app {
+    display: flex;
+    width: 100vw; height: 100vh;
+    align-items: center; justify-content: center;
+  }
 
-  /* Controller */
-  #ctrlScreen{display:none;flex-direction:column;align-items:center;
-    justify-content:space-between;width:100%;max-width:420px;min-height:100dvh;
-    padding:18px 20px 32px;z-index:1;gap:14px;animation:fi .4s ease}
-  .chdr{display:flex;align-items:center;justify-content:space-between;width:100%}
-  .ctitle{font-family:'Orbitron',sans-serif;font-size:.68rem;letter-spacing:.2em;
-    color:var(--accent);text-shadow:var(--glow)}
-  .clive{display:flex;align-items:center;gap:6px;font-size:.62rem;color:var(--muted)}
-  .clive .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);
-    box-shadow:var(--glow);animation:pulse 1.5s infinite}
-  .cbody{display:flex;align-items:center;justify-content:space-between;
-    width:100%;flex:1;padding:0 8px}
+  /* ── SCREENS (start / wait) ────────────────────────── */
+  .screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 18px;
+    width: 100%; height: 100%;
+    padding: 24px;
+    animation: fadeUp .45s ease;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
 
-  .dpad{position:relative;width:150px;height:150px;flex-shrink:0}
-  .dp{position:absolute;background:var(--btn-bg);border:1.5px solid var(--border);
-    color:var(--muted);display:flex;align-items:center;justify-content:center;
-    cursor:pointer;user-select:none;-webkit-user-select:none;
-    transition:background .07s,box-shadow .07s,color .07s}
-  .dp.on{background:var(--accent);color:#000;box-shadow:var(--glow);border-color:var(--accent)}
-  .dp-u,.dp-d{width:50px;height:50px;left:50px}
-  .dp-l,.dp-r{width:50px;height:50px;top:50px}
-  .dp-u{top:0;    clip-path:polygon(0 15%,50% 0,100% 15%,100% 100%,0 100%)}
-  .dp-d{top:100px;clip-path:polygon(0 0,100% 0,100% 85%,50% 100%,0 85%)}
-  .dp-l{left:0;   clip-path:polygon(0 50%,15% 0,100% 0,100% 100%,15% 100%)}
-  .dp-r{left:100px;clip-path:polygon(0 0,85% 0,100% 50%,85% 100%,0 100%)}
-  .dp-c{position:absolute;top:50px;left:50px;width:50px;height:50px;
-    background:var(--border);display:flex;align-items:center;justify-content:center}
-  .dp-cd{width:8px;height:8px;border-radius:50%;background:var(--muted)}
-  .asv{width:18px;height:18px;fill:currentColor;pointer-events:none}
+  .logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(2rem,6vw,3.2rem);
+    font-weight: 900;
+    letter-spacing: .22em;
+    color: var(--accent);
+    text-shadow: var(--glow-y);
+    line-height: 1;
+  }
+  .logo em { color: var(--blue); font-style: normal; text-shadow: var(--glow-b); }
 
-  .btnA{width:86px;height:86px;border-radius:50%;background:var(--btn-bg);
-    border:2.5px solid var(--danger);color:var(--danger);
-    font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;user-select:none;-webkit-user-select:none;
-    transition:background .07s,box-shadow .07s,color .07s;
-    box-shadow:0 0 0 6px rgba(255,45,85,.08)}
-  .btnA.on{background:var(--danger);color:#fff;box-shadow:0 0 24px rgba(255,45,85,.7)}
+  .subtitle {
+    font-size: clamp(.7rem,2vw,1rem);
+    letter-spacing: .18em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
 
-  .ibox{width:100%;background:var(--panel);border:1px solid var(--border);
-    padding:10px 14px;display:flex;align-items:center;justify-content:space-between;
-    gap:8px;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)}
-  .ilbl{font-size:.6rem;color:var(--muted);letter-spacing:.1em}
-  .ival{font-size:.73rem;color:var(--accent);letter-spacing:.08em}
-  .cftr{width:100%;display:flex;justify-content:center}
-  .sbadge{font-size:.57rem;color:var(--muted);letter-spacing:.08em;opacity:.45}
+  .cta {
+    margin-top: 8px;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(.7rem,1.8vw,.9rem);
+    font-weight: 900;
+    letter-spacing: .18em;
+    padding: 12px 40px;
+    border: none;
+    cursor: pointer;
+    clip-path: polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+    transition: box-shadow .15s, transform .1s;
+  }
+  .cta:hover  { box-shadow: var(--glow-y); }
+  .cta:active { transform: scale(.96); }
+  .cta:disabled { opacity: .35; cursor: not-allowed; }
+
+  .spinner {
+    width: 50px; height: 50px;
+    border: 3px solid var(--blue);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    box-shadow: var(--glow-b);
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  .pulse-row { display:flex; align-items:center; gap:9px; font-size:.8rem; color:var(--muted); letter-spacing:.1em; }
+  .pdot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:var(--glow-y); animation:pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.25;transform:scale(.5)} }
+
+  /* ── CONTROLLER LAYOUT ─────────────────────────────── */
+  #ctrl {
+    display: none;
+    width: 100vw; height: 100vh;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 clamp(16px,4vw,48px);
+    position: relative;
+    animation: fadeUp .35s ease;
+  }
+
+  /* centre strip */
+  .centre {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    z-index: 1;
+  }
+  .ctrl-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(.5rem,1.4vw,.75rem);
+    letter-spacing: .22em;
+    color: var(--accent);
+    text-shadow: var(--glow-y);
+  }
+  .live-badge {
+    display: flex; align-items: center; gap: 5px;
+    font-size: clamp(.45rem,1.2vw,.65rem);
+    letter-spacing: .12em;
+    color: var(--muted);
+  }
+  .live-badge .dot { width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:var(--glow-y);animation:pulse 1.5s infinite; }
+
+  .session-badge {
+    font-size: clamp(.4rem,1vw,.58rem);
+    color: var(--muted);
+    letter-spacing: .08em;
+    opacity: .5;
+  }
+
+  /* Input readout bar */
+  .readout {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 5px 14px;
+    clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+    display: flex; gap: 20px;
+    font-size: clamp(.45rem,1.2vw,.65rem);
+    letter-spacing: .08em;
+    white-space: nowrap;
+  }
+  .readout span { color: var(--muted); }
+  .readout b    { color: var(--accent); font-weight: 600; }
+
+  /* ── D-PAD ─────────────────────────────────────────── */
+  .dpad-wrap {
+    display: flex;
+    align-items: center; justify-content: center;
+    flex: 0 0 auto;
+  }
+
+  .dpad {
+    position: relative;
+    width:  clamp(130px, 22vw, 190px);
+    height: clamp(130px, 22vw, 190px);
+  }
+
+  .dp {
+    position: absolute;
+    background: var(--btn);
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    user-select: none; -webkit-user-select: none;
+    transition: background .07s, color .07s, box-shadow .07s;
+  }
+
+  /* size each arm as 1/3 of the dpad */
+  .dp-u, .dp-d { width:33.33%; height:33.33%; left:33.33%; }
+  .dp-l, .dp-r { width:33.33%; height:33.33%; top:33.33%; }
+  .dp-u { top:0;     clip-path:polygon(0 20%,50% 0,100% 20%,100% 100%,0 100%); }
+  .dp-d { top:66.66%;clip-path:polygon(0 0,100% 0,100% 80%,50% 100%,0 80%); }
+  .dp-l { left:0;    clip-path:polygon(0 50%,20% 0,100% 0,100% 100%,20% 100%); }
+  .dp-r { left:66.66%;clip-path:polygon(0 0,80% 0,100% 50%,80% 100%,0 100%); }
+
+  .dp.on { background: var(--accent); color: #000; box-shadow: var(--glow-y); border-color: var(--accent); }
+
+  .dp-centre {
+    position: absolute;
+    top:33.33%; left:33.33%;
+    width:33.33%; height:33.33%;
+    background: var(--border);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .dp-dot { width:8px; height:8px; border-radius:50%; background:var(--muted); }
+
+  .arrow { width: clamp(14px,2.2vw,20px); height: clamp(14px,2.2vw,20px); fill:currentColor; pointer-events:none; }
+
+  /* ── A BUTTON ──────────────────────────────────────── */
+  .action-wrap {
+    display: flex;
+    align-items: center; justify-content: center;
+    flex: 0 0 auto;
+  }
+
+  .btn-a {
+    width:  clamp(80px,14vw,120px);
+    height: clamp(80px,14vw,120px);
+    border-radius: 50%;
+    background: var(--btn);
+    border: 2.5px solid var(--red);
+    color: var(--red);
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.2rem,3vw,2rem);
+    font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    user-select: none; -webkit-user-select: none;
+    transition: background .07s, color .07s, box-shadow .07s;
+    box-shadow: 0 0 0 8px rgba(255,59,59,.07);
+  }
+  .btn-a.on { background:var(--red); color:#fff; box-shadow:var(--glow-r); }
+
+  /* decorative corner lines */
+  #ctrl::before, #ctrl::after {
+    content: '';
+    position: absolute;
+    width: 60px; height: 60px;
+    border-color: var(--border);
+    border-style: solid;
+    opacity: .4;
+    pointer-events: none;
+  }
+  #ctrl::before { top:12px; left:12px;  border-width:2px 0 0 2px; }
+  #ctrl::after  { bottom:12px; right:12px; border-width:0 2px 2px 0; }
 </style>
 </head>
 <body>
 
-<!-- ══ SETUP SCREEN ══════════════════════════════════════════ -->
-<div class="screen" id="setupScreen">
-  <div class="logo">CTR<span>L</span></div>
-  <div class="stitle">ONE-TIME SETUP</div>
-
-  <div class="field">
-    <label>FIREBASE DATABASE URL</label>
-    <input id="iDbUrl" placeholder="https://YOUR-PROJECT-default-rtdb.firebaseio.com" autocomplete="off"/>
-  </div>
-
-  <div class="err" id="setupErr"></div>
-  <button class="cta" onclick="saveSetup()">TEST &amp; SAVE</button>
-
-  <div class="hint">
-    <b>Free Firebase setup (2 min):</b><br/>
-    1. Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a><br/>
-    2. <b>Add project</b> → give it any name → continue<br/>
-    3. Left menu → <b>Build → Realtime Database → Create Database</b><br/>
-    4. Choose <i>Start in test mode</i> (allows read/write for 30 days — enough to test)<br/>
-    5. Copy the URL shown (looks like <code>https://myproject-default-rtdb.firebaseio.com</code>)<br/>
-    6. Paste it above and press SAVE.<br/><br/>
-    Also paste the same URL into <b>WebController.cs</b> in Unity.
-  </div>
+<!-- Rotate nudge -->
+<div id="rotateMsg">
+  <svg viewBox="0 0 24 24"><path d="M16.48 2.52c3.27 1.55 5.61 4.72 5.97 8.48h1.55C23.44 4.84 18.29 0 12 0l-.66.03 3.81 3.81 1.33-1.32zm-6.25-.77c-.59-.59-1.54-.59-2.12 0L1.75 8.11c-.59.59-.59 1.54 0 2.12l14.14 14.14c.59.59 1.54.59 2.12 0l6.36-6.36c.59-.59.59-1.54 0-2.12L10.23 1.75zm4.6 19.44l-14.14-14.13 6.36-6.36 14.14 14.13-6.36 6.36zm-7.57 1.34C4.01 20.97 1.67 17.8 1.31 14.04H-.24C.15 19.16 5.3 24 11.59 24l.66-.03-3.81-3.81-1.18 1.37z"/></svg>
+  <p>ROTATE TO LANDSCAPE</p>
 </div>
 
-<!-- ══ START SCREEN ══════════════════════════════════════════ -->
-<div class="screen" id="startScreen" style="display:none">
-  <div class="logo">CTR<span>L</span></div>
-  <div class="stitle">REMOTE CONTROLLER</div>
-  <div class="ssub">Use your phone as a wireless game controller.</div>
-  <button class="cta" id="startBtn" onclick="tryStart()">▶ START GAME</button>
-  <div class="ssub" id="checkMsg" style="display:none;color:var(--accent2)">CHECKING SESSION...</div>
-  <div class="err" id="startErr"></div>
-</div>
+<!-- App root -->
+<div id="app">
 
-<!-- ══ WAIT SCREEN ═══════════════════════════════════════════ -->
-<div class="screen" id="waitScreen" style="display:none">
-  <div class="logo">CTR<span>L</span></div>
-  <div class="spinner"></div>
-  <div class="stitle">SESSION OCCUPIED</div>
-  <div class="ssub">Another player is active. You will be redirected automatically when they finish.</div>
-  <div class="pulse-row"><div class="pdot"></div>WAITING...</div>
-</div>
-
-<!-- ══ CONTROLLER ════════════════════════════════════════════ -->
-<div id="ctrlScreen">
-  <div class="chdr">
-    <div class="ctitle">◈ CTRL — ACTIVE</div>
-    <div class="clive"><div class="dot"></div>LIVE</div>
+  <!-- START -->
+  <div class="screen" id="startScreen">
+    <div class="logo">CTR<em>L</em></div>
+    <div class="subtitle">Remote Game Controller</div>
+    <button class="cta" id="startBtn" onclick="tryStart()">▶ START SESSION</button>
+    <div style="font-size:.7rem;color:var(--muted);letter-spacing:.08em;min-height:1em" id="startMsg"></div>
   </div>
-  <div class="cbody">
-    <div class="dpad">
-      <div class="dp dp-u" id="bUp">  <svg class="asv" viewBox="0 0 24 24"><path d="M12 4l-8 10h16z"/></svg></div>
-      <div class="dp dp-d" id="bDown"><svg class="asv" viewBox="0 0 24 24"><path d="M12 20l8-10H4z"/></svg></div>
-      <div class="dp dp-l" id="bLeft"><svg class="asv" viewBox="0 0 24 24"><path d="M4 12l10-8v16z"/></svg></div>
-      <div class="dp dp-r" id="bRight"><svg class="asv" viewBox="0 0 24 24"><path d="M20 12L10 4v16z"/></svg></div>
-      <div class="dp-c"><div class="dp-cd"></div></div>
+
+  <!-- WAIT -->
+  <div class="screen" id="waitScreen" style="display:none">
+    <div class="logo">CTR<em>L</em></div>
+    <div class="spinner"></div>
+    <div class="subtitle">Session Occupied</div>
+    <div style="font-size:.72rem;color:var(--muted);max-width:280px;text-align:center;line-height:1.7">
+      Another player is active.<br/>You'll be let in automatically when they finish.
     </div>
-    <div class="btnA" id="bA">A</div>
+    <div class="pulse-row"><div class="pdot"></div>MONITORING</div>
   </div>
-  <div class="ibox">
-    <div><div class="ilbl">ACTIVE INPUT</div><div class="ival" id="iDisp">NONE</div></div>
-    <div style="text-align:right"><div class="ilbl">SYNCED</div><div class="ival" id="iSent">—</div></div>
-  </div>
-  <div class="cftr"><div class="sbadge" id="sBadge">SESSION: —</div></div>
-</div>
+
+  <!-- CONTROLLER -->
+  <div id="ctrl">
+
+    <!-- LEFT: D-Pad -->
+    <div class="dpad-wrap">
+      <div class="dpad" id="dpad">
+        <div class="dp dp-u" id="bUp">
+          <svg class="arrow" viewBox="0 0 24 24"><path d="M12 4l-8 10h16z"/></svg>
+        </div>
+        <div class="dp dp-d" id="bDown">
+          <svg class="arrow" viewBox="0 0 24 24"><path d="M12 20l8-10H4z"/></svg>
+        </div>
+        <div class="dp dp-l" id="bLeft">
+          <svg class="arrow" viewBox="0 0 24 24"><path d="M4 12l10-8v16z"/></svg>
+        </div>
+        <div class="dp dp-r" id="bRight">
+          <svg class="arrow" viewBox="0 0 24 24"><path d="M20 12L10 4v16z"/></svg>
+        </div>
+        <div class="dp-centre"><div class="dp-dot"></div></div>
+      </div>
+    </div>
+
+    <!-- CENTRE: status -->
+    <div class="centre">
+      <div class="ctrl-title">◈ CTRL</div>
+      <div class="live-badge"><div class="dot"></div>LIVE</div>
+      <div class="readout">
+        <span>INPUT&nbsp;<b id="iDisp">—</b></span>
+        <span>SYNC&nbsp;<b id="iSent">—</b></span>
+      </div>
+      <div class="session-badge" id="sBadge">—</div>
+    </div>
+
+    <!-- RIGHT: A button -->
+    <div class="action-wrap">
+      <div class="btn-a" id="bA">A</div>
+    </div>
+
+  </div><!-- /ctrl -->
+</div><!-- /app -->
 
 <script>
-// ═══════════════════════════════════════════════════════════
-//  FIREBASE REST API
-//  No SDK needed — Firebase Realtime DB has a plain HTTP API.
-//  URL pattern:  https://<project>-default-rtdb.firebaseio.com/<path>.json
-// ═══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+//  CONFIG — hardcoded Firebase project
+// ══════════════════════════════════════════════════════
+const FB   = 'https://clawmachine-cde3e-default-rtdb.firebaseio.com';
+const PATH = '/ctrl';           // node inside the DB
+const TTL  = 10000;             // session heartbeat window (ms)
 
-const SESSION_TTL = 10000; // ms — heartbeat must refresh within this window
-const DB_PATH     = '/ctrl'; // node inside your Firebase DB
+const fbUrl = () => FB + PATH + '.json';
 
-let DB_URL = localStorage.getItem('ctrl_fb_url') || '';
-
-function fbUrl(path) {
-  return DB_URL.replace(/\/$/, '') + path + '.json';
+async function fbRead() {
+  const r = await fetch(fbUrl());
+  if (!r.ok) throw new Error('Read ' + r.status);
+  return r.json(); // null if node absent
 }
 
-async function fbRead(path) {
-  const r = await fetch(fbUrl(path));
-  if (!r.ok) throw new Error(`Firebase read ${r.status}: ${await r.text()}`);
-  return r.json(); // returns null if node doesn't exist
-}
-
-async function fbWrite(path, data) {
-  const r = await fetch(fbUrl(path), {
+async function fbWrite(data) {
+  const r = await fetch(fbUrl(), {
     method:  'PUT',
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify(data)
   });
-  if (!r.ok) throw new Error(`Firebase write ${r.status}: ${await r.text()}`);
-  return r.json();
+  if (!r.ok) throw new Error('Write ' + r.status);
 }
 
-// ═══════════════════════════════════════════════════════════
-//  UNITY DETECTION — ?unity=1 in URL
-//  Returns ONLY a JSON string, no HTML at all.
-// ═══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+//  UNITY DETECTION — ?unity=1  → return bare JSON only
+// ══════════════════════════════════════════════════════
 const IS_UNITY = new URLSearchParams(location.search).has('unity');
 
 async function serveUnity() {
   let out;
   try {
-    if (!DB_URL) throw new Error('DB_URL not configured');
-    const data = await fbRead(DB_PATH);
+    const d    = await fbRead();
     const now  = Date.now();
-    const alive = data && data.sessionActive && (now - (data.sessionTs || 0)) < SESSION_TTL;
+    const alive = d && d.sessionActive && (now - (d.sessionTs || 0)) < TTL;
     out = {
       sessionActive: !!alive,
       input: {
-        up:    !!(alive && data.input?.up),
-        down:  !!(alive && data.input?.down),
-        left:  !!(alive && data.input?.left),
-        right: !!(alive && data.input?.right),
-        a:     !!(alive && data.input?.a)
+        up:    !!(alive && d.input?.up),
+        down:  !!(alive && d.input?.down),
+        left:  !!(alive && d.input?.left),
+        right: !!(alive && d.input?.right),
+        a:     !!(alive && d.input?.a)
       },
       timestamp: now
     };
   } catch(e) {
-    out = { error: e.message, sessionActive: false,
-            input: {up:false,down:false,left:false,right:false,a:false} };
+    out = { error: e.message, sessionActive:false,
+            input:{up:false,down:false,left:false,right:false,a:false} };
   }
-  // Replace entire document with plain JSON text
   document.open('text/plain');
   document.write(JSON.stringify(out));
   document.close();
 }
 
-// ═══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  SCREEN HELPER
-// ═══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 function show(id) {
-  ['setupScreen','startScreen','waitScreen','ctrlScreen'].forEach(s => {
+  ['startScreen','waitScreen','ctrl'].forEach(s => {
     const el = document.getElementById(s);
-    el.style.display = (s === id) ? 'flex' : 'none';
+    el.style.display = s === id ? (s === 'ctrl' ? 'flex' : 'flex') : 'none';
   });
 }
 
-// ═══════════════════════════════════════════════════════════
-//  SETUP
-// ═══════════════════════════════════════════════════════════
-async function saveSetup() {
-  const url = document.getElementById('iDbUrl').value.trim().replace(/\/$/, '');
-  const errEl = document.getElementById('setupErr');
-  errEl.textContent = '';
-
-  if (!url.startsWith('https://') || !url.includes('firebaseio.com')) {
-    errEl.textContent = '✗ Must be a firebaseio.com URL';
-    return;
-  }
-
-  errEl.textContent = 'Testing connection...';
-  DB_URL = url;
-
-  try {
-    // Write a test value then read it back
-    await fetch(url + '/ctrl_test.json', {
-      method: 'PUT',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ ok: true })
-    });
-    const r = await fetch(url + '/ctrl_test.json');
-    if (!r.ok) throw new Error('Read test failed ' + r.status);
-    const d = await r.json();
-    if (!d || !d.ok) throw new Error('Data mismatch');
-
-    // Initialise the ctrl node if empty
-    const existing = await fbRead(DB_PATH);
-    if (!existing) {
-      await fbWrite(DB_PATH, {
-        sessionActive: false, sessionTs: 0, sessionToken: null,
-        input: {up:false,down:false,left:false,right:false,a:false}
-      });
-    }
-
-    localStorage.setItem('ctrl_fb_url', url);
-    errEl.textContent = '';
-    show('startScreen');
-  } catch(e) {
-    errEl.textContent = '✗ ' + e.message;
-    DB_URL = '';
-  }
-}
-
-// ═══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  SESSION
-// ═══════════════════════════════════════════════════════════
-let hbTimer  = null;
-let waitTimer = null;
-let myToken  = null;
-const inp = {up:false,down:false,left:false,right:false,a:false};
+// ══════════════════════════════════════════════════════
+let hbTimer   = null;
+let waitTimer  = null;
+let myToken   = null;
+const inp = { up:false, down:false, left:false, right:false, a:false };
 
 async function tryStart() {
-  const btn    = document.getElementById('startBtn');
-  const msg    = document.getElementById('checkMsg');
-  const errEl  = document.getElementById('startErr');
+  const btn = document.getElementById('startBtn');
+  const msg = document.getElementById('startMsg');
   btn.disabled = true;
-  msg.style.display = 'block';
-  errEl.textContent = '';
-
+  msg.textContent = 'CHECKING...';
   try {
-    const data  = await fbRead(DB_PATH);
-    const now   = Date.now();
-    const alive = data && data.sessionActive && (now - (data.sessionTs || 0)) < SESSION_TTL;
-
+    const d    = await fbRead();
+    const now  = Date.now();
+    const alive = d && d.sessionActive && (now - (d.sessionTs || 0)) < TTL;
     if (alive) {
       show('waitScreen');
       startWaitPoll();
     } else {
       myToken = Math.random().toString(36).slice(2,8).toUpperCase();
-      await fbWrite(DB_PATH, {
-        sessionActive: true,
-        sessionTs:     Date.now(),
-        sessionToken:  myToken,
-        input:         {up:false,down:false,left:false,right:false,a:false}
-      });
-      document.getElementById('sBadge').textContent = 'SESSION: ' + myToken;
-      show('ctrlScreen');
+      await fbWrite({ sessionActive:true, sessionTs:Date.now(),
+                      sessionToken:myToken,
+                      input:{up:false,down:false,left:false,right:false,a:false} });
+      document.getElementById('sBadge').textContent = 'SID ' + myToken;
+      show('ctrl');
       bindControls();
       startHb();
     }
   } catch(e) {
     btn.disabled = false;
-    msg.style.display = 'none';
-    errEl.textContent = '✗ ' + e.message;
+    msg.textContent = '✗ ' + e.message;
   }
 }
 
 function startHb() {
   hbTimer = setInterval(async () => {
     try {
-      await fbWrite(DB_PATH, {
-        sessionActive: true,
-        sessionTs:     Date.now(),
-        sessionToken:  myToken,
-        input:         {...inp}
-      });
+      await fbWrite({ sessionActive:true, sessionTs:Date.now(),
+                      sessionToken:myToken, input:{...inp} });
       refreshDisp();
-    } catch(e) { /* retry next tick */ }
+    } catch(e) {}
   }, 300);
-
   window.addEventListener('beforeunload', releaseSession);
 }
 
 async function releaseSession() {
   clearInterval(hbTimer);
   try {
-    await fbWrite(DB_PATH, {
-      sessionActive: false, sessionTs: 0, sessionToken: null,
-      input: {up:false,down:false,left:false,right:false,a:false}
-    });
+    await fbWrite({ sessionActive:false, sessionTs:0, sessionToken:null,
+                    input:{up:false,down:false,left:false,right:false,a:false} });
   } catch(e) {}
 }
 
 function startWaitPoll() {
   waitTimer = setInterval(async () => {
     try {
-      const data  = await fbRead(DB_PATH);
-      const now   = Date.now();
-      const alive = data && data.sessionActive && (now - (data.sessionTs || 0)) < SESSION_TTL;
+      const d    = await fbRead();
+      const now  = Date.now();
+      const alive = d && d.sessionActive && (now - (d.sessionTs||0)) < TTL;
       if (!alive) {
         clearInterval(waitTimer);
         document.getElementById('startBtn').disabled = false;
-        document.getElementById('checkMsg').style.display = 'none';
+        document.getElementById('startMsg').textContent = '';
         show('startScreen');
       }
     } catch(e) {}
   }, 2500);
 }
 
-// ═══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  INPUT BINDING
-// ═══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 function bindControls() {
   [['bUp','up'],['bDown','down'],['bLeft','left'],['bRight','right'],['bA','a']]
   .forEach(([id, key]) => {
@@ -406,11 +485,12 @@ function bindControls() {
     el.addEventListener('touchstart',  dn, {passive:false});
     el.addEventListener('touchend',    up, {passive:false});
     el.addEventListener('touchcancel', up, {passive:false});
-    el.addEventListener('mousedown',   dn);
-    el.addEventListener('mouseup',     up);
-    el.addEventListener('mouseleave',  up);
+    el.addEventListener('mousedown', dn);
+    el.addEventListener('mouseup',   up);
+    el.addEventListener('mouseleave',up);
   });
 
+  // Keyboard (desktop testing)
   const km = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyA:'a',Space:'a'};
   window.addEventListener('keydown', e => {
     const k=km[e.code]; if(!k) return; e.preventDefault(); inp[k]=true;
@@ -423,7 +503,7 @@ function bindControls() {
 }
 
 function refreshDisp() {
-  const a = Object.entries(inp).filter(([,v])=>v).map(([k])=>k.toUpperCase()).join('+') || 'NONE';
+  const a = Object.entries(inp).filter(([,v])=>v).map(([k])=>k.toUpperCase()).join('+') || '—';
   document.getElementById('iDisp').textContent = a;
   const n = new Date();
   document.getElementById('iSent').textContent =
@@ -432,12 +512,12 @@ function refreshDisp() {
     String(n.getSeconds()).padStart(2,'0');
 }
 
-// ═══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 //  BOOT
-// ═══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
 window.addEventListener('load', async () => {
   if (IS_UNITY) { await serveUnity(); return; }
-  show(!DB_URL ? 'setupScreen' : 'startScreen');
+  show('startScreen');
 });
 </script>
 </body>
