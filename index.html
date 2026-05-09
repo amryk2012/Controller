@@ -568,7 +568,7 @@
 const FB       = 'https://clawmachine-cde3e-default-rtdb.firebaseio.com';
 const PATH     = '/ctrl';
 const LB_PATH  = '/leaderboard';
-const TTL      = 10000;
+const TTL      = 10000;   // ms — heartbeat must be fresher than this to count as "alive"
 const LB_MAX   = 10;
 
 const fbUrl    = ()  => FB + PATH + '.json';
@@ -590,6 +590,33 @@ async function fbWrite(url, data) {
 }
 
 // ══════════════════════════════════════════════════════
+//  SESSION SLOT HELPERS
+//
+//  A slot is considered FREE when ALL of the following are true:
+//    1. sessionActive === false   — no one is actively heartbeating
+//    2. sessionEnded  === true    — Unity (or browser) explicitly closed it
+//    OR the heartbeat timestamp is older than TTL (stale/crashed session)
+//
+//  A slot is considered OCCUPIED when:
+//    sessionActive === true AND heartbeat is fresh AND sessionEnded !== true
+//
+//  This two-flag design means:
+//    - Unity sets sessionEnded:true when the timer fires  →  browser sees it immediately
+//    - Browser sets sessionEnded:false when it claims the slot  →  clean slate
+//    - If browser crashes without writing, Unity's sessionEnded:true flag still
+//      allows the next player in (no permanently-stuck sessions)
+// ══════════════════════════════════════════════════════
+function isSlotFree(d) {
+  if (!d) return true;                              // nothing in DB → free
+  const now     = Date.now();
+  const stale   = (now - (d.sessionTs || 0)) > TTL; // heartbeat too old → crashed session
+  const ended   = !!d.sessionEnded;                 // Unity explicitly ended the turn
+  const active  = !!d.sessionActive;
+  // Free if: not active, OR stale heartbeat, OR Unity flagged it as ended
+  return !active || stale || ended;
+}
+
+// ══════════════════════════════════════════════════════
 //  UNITY DETECTION — ?unity=1  → return bare JSON only
 // ══════════════════════════════════════════════════════
 const IS_UNITY = new URLSearchParams(location.search).has('unity');
@@ -599,9 +626,10 @@ async function serveUnity() {
   try {
     const d    = await fbRead();
     const now  = Date.now();
-    const alive = d && d.sessionActive && (now - (d.sessionTs || 0)) < TTL;
+    const alive = d && d.sessionActive && !d.sessionEnded && (now - (d.sessionTs || 0)) < TTL;
     out = {
       sessionActive: !!alive,
+      sessionEnded:  !!d?.sessionEnded,   // expose flag so Unity can read it too
       playerName: alive ? (d.playerName || '') : '',
       input: {
         up:    !!(alive && d.input?.up),
@@ -613,7 +641,7 @@ async function serveUnity() {
       timestamp: now
     };
   } catch(e) {
-    out = { error: e.message, sessionActive:false, playerName:'',
+    out = { error: e.message, sessionActive:false, sessionEnded:false, playerName:'',
             input:{up:false,down:false,left:false,right:false,a:false} };
   }
   document.open('text/plain');
@@ -684,7 +712,14 @@ let sessionKilled  = false;   // guard: prevent double-trigger
 const inp = { up:false, down:false, left:false, right:false, a:false };
 
 // ══════════════════════════════════════════════════════
-//  SESSION MONITOR — detects when Unity kills the session
+//  SESSION MONITOR
+//
+//  Watches for Unity killing the session in two ways:
+//    1. sessionEnded:true  — Unity timer fired (primary, fast signal)
+//    2. sessionActive:false + stale heartbeat  — fallback for crashes/edge cases
+//
+//  Using sessionEnded as the primary trigger means the browser reacts
+//  within ~1.5 s of Unity writing the flag, regardless of heartbeat timing.
 // ══════════════════════════════════════════════════════
 function startSessionMonitor() {
   sessionKilled = false;
@@ -693,8 +728,8 @@ function startSessionMonitor() {
     try {
       const d   = await fbRead();
       const now = Date.now();
-      // Alive = sessionActive flag is true AND heartbeat is fresh
-      const alive = d && d.sessionActive && (now - (d.sessionTs || 0)) < TTL;
+      // Alive = active flag true AND not ended AND heartbeat is fresh
+      const alive = d && d.sessionActive && !d.sessionEnded && (now - (d.sessionTs || 0)) < TTL;
       if (!alive) {
         handleSessionKilled('TIME UP');
       }
@@ -762,28 +797,35 @@ async function tryStart() {
   msg.textContent = 'CHECKING...';
 
   try {
-    const d    = await fbRead();
-    const now  = Date.now();
-    const alive = d && d.sessionActive && (now - (d.sessionTs || 0)) < TTL;
-    if (alive) {
+    const d = await fbRead();
+
+    if (!isSlotFree(d)) {
+      // ── Slot is genuinely occupied by another active player ──
       show('waitScreen');
       startWaitPoll();
-    } else {
-      myToken = Math.random().toString(36).slice(2,8).toUpperCase();
-      await fbWrite(fbUrl(), {
-        sessionActive: true,
-        sessionTs:     Date.now(),
-        sessionToken:  myToken,
-        playerName:    myName,
-        input: { up:false, down:false, left:false, right:false, a:false }
-      });
-      document.getElementById('sBadge').textContent  = 'SID ' + myToken;
-      document.getElementById('pBadge').textContent  = '▶ ' + myName;
-      show('ctrl');
-      bindControls();
-      startHb();
-      startSessionMonitor();   // watch for Unity-side session termination
+      return;
     }
+
+    // ── Slot is free — claim it ──────────────────────────────
+    // Always set sessionEnded:false explicitly when starting a fresh session.
+    // This clears any leftover flag from the previous player's turn.
+    myToken = Math.random().toString(36).slice(2,8).toUpperCase();
+    await fbWrite(fbUrl(), {
+      sessionActive: true,
+      sessionEnded:  false,   // ← clear previous turn's ended flag
+      sessionTs:     Date.now(),
+      sessionToken:  myToken,
+      playerName:    myName,
+      input: { up:false, down:false, left:false, right:false, a:false }
+    });
+
+    document.getElementById('sBadge').textContent  = 'SID ' + myToken;
+    document.getElementById('pBadge').textContent  = '▶ ' + myName;
+    show('ctrl');
+    bindControls();
+    startHb();
+    startSessionMonitor();
+
   } catch(e) {
     btn.disabled = false;
     msg.textContent = '✗ ' + e.message;
@@ -799,6 +841,7 @@ function startHb() {
     try {
       await fbWrite(fbUrl(), {
         sessionActive: true,
+        sessionEnded:  false,   // keep this false on every heartbeat
         sessionTs:     Date.now(),
         sessionToken:  myToken,
         playerName:    myName,
@@ -816,8 +859,14 @@ async function releaseSession() {
   clearInterval(hbTimer);
   hbTimer = null;
   try {
+    // Write sessionEnded:true so Unity (and waiting players) know this slot is free
+    // even if sessionActive:false isn't processed before the page closes.
     await fbWrite(fbUrl(), {
-      sessionActive: false, sessionTs: 0, sessionToken: null, playerName: null,
+      sessionActive: false,
+      sessionEnded:  true,    // ← explicit "turn is done" signal
+      sessionTs:     0,
+      sessionToken:  null,
+      playerName:    null,
       input: { up:false, down:false, left:false, right:false, a:false }
     });
   } catch(e) {}
@@ -825,14 +874,16 @@ async function releaseSession() {
 
 // ══════════════════════════════════════════════════════
 //  WAIT POLL (queue while session occupied)
+//
+//  Uses isSlotFree() — same logic as tryStart — so we correctly
+//  detect freedom via sessionEnded:true even if sessionActive is
+//  still true (e.g. Unity hasn't fully updated yet).
 // ══════════════════════════════════════════════════════
 function startWaitPoll() {
   waitTimer = setInterval(async () => {
     try {
-      const d    = await fbRead();
-      const now  = Date.now();
-      const alive = d && d.sessionActive && (now - (d.sessionTs||0)) < TTL;
-      if (!alive) {
+      const d = await fbRead();
+      if (isSlotFree(d)) {
         clearInterval(waitTimer);
         document.getElementById('startBtn').disabled = false;
         document.getElementById('startMsg').textContent = '';
