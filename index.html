@@ -7,592 +7,329 @@
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    --bg: #0a0a0f;
-    --panel: #12121a;
-    --border: #1e1e30;
-    --accent: #00f5a0;
-    --accent2: #00b4d8;
-    --danger: #ff2d55;
-    --text: #e0e0ff;
-    --muted: #555577;
-    --btn-bg: #1a1a2e;
-    --btn-active: #00f5a0;
-    --glow: 0 0 18px rgba(0,245,160,0.45);
-    --glow2: 0 0 18px rgba(0,180,216,0.45);
+    --bg:#0a0a0f; --panel:#12121a; --border:#1e1e30;
+    --accent:#00f5a0; --accent2:#00b4d8; --danger:#ff2d55;
+    --text:#e0e0ff; --muted:#555577; --btn-bg:#1a1a2e;
+    --glow:0 0 18px rgba(0,245,160,.45);
+    --glow2:0 0 18px rgba(0,180,216,.45);
   }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;position:relative}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,245,160,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,160,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+  body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:0}
 
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  .screen{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:36px 24px;z-index:1;text-align:center;animation:fi .5s ease;width:100%}
+  @keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .logo{font-family:'Orbitron',sans-serif;font-size:2.8rem;font-weight:900;letter-spacing:.18em;color:var(--accent);text-shadow:var(--glow)}
+  .logo span{color:var(--accent2);text-shadow:var(--glow2)}
+  .stitle{font-family:'Orbitron',sans-serif;font-size:.95rem;letter-spacing:.14em;opacity:.85}
+  .ssub{font-size:.74rem;color:var(--muted);letter-spacing:.05em;line-height:1.8;max-width:300px}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-  }
+  .cta{background:transparent;border:2px solid var(--accent);color:var(--accent);font-family:'Orbitron',sans-serif;font-size:.82rem;letter-spacing:.15em;padding:13px 36px;cursor:pointer;position:relative;overflow:hidden;transition:color .2s,box-shadow .2s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
+  .cta::before{content:'';position:absolute;inset:0;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s ease;z-index:-1}
+  .cta:hover{color:#000;box-shadow:var(--glow)}.cta:hover::before{transform:scaleX(1)}.cta:active{transform:scale(.96)}.cta:disabled{opacity:.35;cursor:not-allowed}
 
-  /* Animated grid background */
-  body::before {
-    content:'';
-    position:fixed;
-    inset:0;
-    background-image:
-      linear-gradient(rgba(0,245,160,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,245,160,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events:none;
-    z-index:0;
-  }
+  .spinner{width:54px;height:54px;border:3px solid var(--accent2);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;box-shadow:var(--glow2)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .pulse-row{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.7rem}
+  .pdot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:var(--glow);animation:pulse 1.2s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.55)}}
 
-  /* Scanlines */
-  body::after {
-    content:'';
-    position:fixed;
-    inset:0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.08) 2px,
-      rgba(0,0,0,0.08) 4px
-    );
-    pointer-events:none;
-    z-index:0;
-  }
+  /* Setup */
+  .field{display:flex;flex-direction:column;gap:7px;width:100%;max-width:330px}
+  .field label{font-size:.62rem;color:var(--muted);letter-spacing:.1em}
+  .field input{background:var(--panel);border:1.5px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.78rem;padding:10px 14px;width:100%;outline:none;transition:border-color .2s}
+  .field input:focus{border-color:var(--accent)}
+  .hint{font-size:.59rem;color:var(--muted);line-height:1.75;max-width:310px}
+  .hint a{color:var(--accent2)}.hint code{background:var(--panel);padding:1px 5px;border:1px solid var(--border);font-size:.58rem;word-break:break-all}
 
-  /* ─── STATUS SCREENS ─────────────────────────────── */
-  .status-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 28px;
-    padding: 40px 24px;
-    z-index: 1;
-    text-align: center;
-    animation: fadeIn .6s ease;
-  }
+  /* Controller */
+  #ctrlScreen{display:none;flex-direction:column;align-items:center;justify-content:space-between;width:100%;max-width:420px;min-height:100dvh;padding:18px 20px 32px;z-index:1;gap:14px;animation:fi .4s ease}
+  .chdr{display:flex;align-items:center;justify-content:space-between;width:100%}
+  .ctitle{font-family:'Orbitron',sans-serif;font-size:.68rem;letter-spacing:.2em;color:var(--accent);text-shadow:var(--glow)}
+  .clive{display:flex;align-items:center;gap:6px;font-size:.63rem;color:var(--muted)}
+  .clive .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:var(--glow);animation:pulse 1.5s infinite}
+  .cbody{display:flex;align-items:center;justify-content:space-between;width:100%;flex:1;padding:0 8px}
 
-  @keyframes fadeIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+  .dpad{position:relative;width:150px;height:150px;flex-shrink:0}
+  .dp{position:absolute;background:var(--btn-bg);border:1.5px solid var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .08s,box-shadow .08s,color .08s}
+  .dp.pressed{background:var(--accent);color:#000;box-shadow:var(--glow);border-color:var(--accent)}
+  .dp-u,.dp-d{width:50px;height:50px;left:50px}
+  .dp-l,.dp-r{width:50px;height:50px;top:50px}
+  .dp-u{top:0;clip-path:polygon(0 15%,50% 0,100% 15%,100% 100%,0 100%)}
+  .dp-d{top:100px;clip-path:polygon(0 0,100% 0,100% 85%,50% 100%,0 85%)}
+  .dp-l{left:0;clip-path:polygon(0 50%,15% 0,100% 0,100% 100%,15% 100%)}
+  .dp-r{left:100px;clip-path:polygon(0 0,85% 0,100% 50%,85% 100%,0 100%)}
+  .dp-c{position:absolute;top:50px;left:50px;width:50px;height:50px;background:var(--border);display:flex;align-items:center;justify-content:center}
+  .dp-cd{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+  .asv{width:18px;height:18px;fill:currentColor;pointer-events:none}
 
-  .logo {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 3rem;
-    font-weight: 900;
-    letter-spacing: .18em;
-    color: var(--accent);
-    text-shadow: var(--glow);
-  }
+  .btnA{width:86px;height:86px;border-radius:50%;background:var(--btn-bg);border:2.5px solid var(--danger);color:var(--danger);font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .08s,box-shadow .08s,color .08s;box-shadow:0 0 0 6px rgba(255,45,85,.08)}
+  .btnA.pressed{background:var(--danger);color:#fff;box-shadow:0 0 24px rgba(255,45,85,.7)}
 
-  .logo span { color: var(--accent2); text-shadow: var(--glow2); }
-
-  .status-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.1rem;
-    letter-spacing: .12em;
-    color: var(--text);
-    opacity: .85;
-  }
-
-  .status-sub {
-    font-size: .78rem;
-    color: var(--muted);
-    letter-spacing: .06em;
-    line-height: 1.7;
-    max-width: 280px;
-  }
-
-  .cta-btn {
-    background: transparent;
-    border: 2px solid var(--accent);
-    color: var(--accent);
-    font-family: 'Orbitron', sans-serif;
-    font-size: .85rem;
-    letter-spacing: .15em;
-    padding: 14px 38px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: color .2s, box-shadow .2s;
-    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-  }
-  .cta-btn::before {
-    content:'';
-    position:absolute;
-    inset:0;
-    background: var(--accent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform .25s ease;
-    z-index:-1;
-  }
-  .cta-btn:hover { color: #000; box-shadow: var(--glow); }
-  .cta-btn:hover::before { transform: scaleX(1); }
-  .cta-btn:active { transform: scale(.96); }
-
-  .wait-icon {
-    width: 64px; height: 64px;
-    border: 3px solid var(--accent2);
-    border-top-color: transparent;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    box-shadow: var(--glow2);
-  }
-  @keyframes spin { to{transform:rotate(360deg)} }
-
-  .pulse-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: var(--glow);
-    animation: pulse 1.2s ease-in-out infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.6)} }
-
-  /* ─── CONTROLLER ─────────────────────────────────── */
-  #controller {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 420px;
-    min-height: 100dvh;
-    padding: 18px 20px 32px;
-    z-index: 1;
-    gap: 12px;
-  }
-
-  .ctrl-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 4px;
-  }
-  .ctrl-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: .7rem;
-    letter-spacing: .2em;
-    color: var(--accent);
-    text-shadow: var(--glow);
-  }
-  .ctrl-status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: .65rem;
-    color: var(--muted);
-  }
-  .ctrl-status .dot { width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:var(--glow);animation:pulse 1.5s infinite; }
-
-  /* Body row */
-  .ctrl-body {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    flex: 1;
-    padding: 0 8px;
-  }
-
-  /* D-Pad */
-  .dpad {
-    position: relative;
-    width: 150px;
-    height: 150px;
-    flex-shrink: 0;
-  }
-
-  .dpad-btn {
-    position: absolute;
-    background: var(--btn-bg);
-    border: 1.5px solid var(--border);
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    user-select: none;
-    transition: background .1s, box-shadow .1s, color .1s;
-    -webkit-user-select: none;
-  }
-
-  .dpad-btn.pressed {
-    background: var(--accent);
-    color: #000;
-    box-shadow: var(--glow);
-    border-color: var(--accent);
-  }
-
-  .dpad-up, .dpad-down { width: 50px; height: 50px; left: 50px; }
-  .dpad-left, .dpad-right { width: 50px; height: 50px; top: 50px; }
-  .dpad-up    { top: 0;    clip-path: polygon(0 15%, 50% 0, 100% 15%, 100% 100%, 0 100%); }
-  .dpad-down  { top: 100px; clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%); }
-  .dpad-left  { left: 0;   clip-path: polygon(0 50%, 15% 0, 100% 0, 100% 100%, 15% 100%); }
-  .dpad-right { left: 100px; clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%); }
-
-  .dpad-center {
-    position: absolute;
-    top: 50px; left: 50px;
-    width: 50px; height: 50px;
-    background: var(--border);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .dpad-center-dot { width:8px;height:8px;border-radius:50%;background:var(--muted); }
-
-  .arrow-svg { width: 18px; height: 18px; fill: currentColor; }
-
-  /* A button */
-  .action-zone {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .btn-a {
-    width: 88px;
-    height: 88px;
-    border-radius: 50%;
-    background: var(--btn-bg);
-    border: 2.5px solid var(--danger);
-    color: var(--danger);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.4rem;
-    font-weight: 900;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-select: none;
-    transition: background .1s, box-shadow .1s, color .1s;
-    box-shadow: 0 0 0 6px rgba(255,45,85,0.08);
-  }
-  .btn-a.pressed {
-    background: var(--danger);
-    color: #fff;
-    box-shadow: 0 0 24px rgba(255,45,85,0.7);
-  }
-
-  /* Input display */
-  .input-display {
-    width: 100%;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
-  }
-  .input-label { font-size:.62rem; color:var(--muted); letter-spacing:.1em; }
-  .input-value { font-size:.75rem; color:var(--accent); letter-spacing:.08em; }
-
-  .ctrl-footer {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
-  .session-badge {
-    font-size: .6rem;
-    color: var(--muted);
-    letter-spacing: .08em;
-    opacity: .5;
-  }
+  .ibox{width:100%;background:var(--panel);border:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)}
+  .ilbl{font-size:.6rem;color:var(--muted);letter-spacing:.1em}
+  .ival{font-size:.74rem;color:var(--accent);letter-spacing:.08em}
+  .cftr{width:100%;display:flex;justify-content:center}
+  .sbadge{font-size:.58rem;color:var(--muted);letter-spacing:.08em;opacity:.45}
 </style>
 </head>
 <body>
 
-<!-- ── START SCREEN ── -->
-<div class="status-screen" id="startScreen">
+<!-- SETUP -->
+<div class="screen" id="setupScreen">
   <div class="logo">CTR<span>L</span></div>
-  <div class="status-title">REMOTE CONTROLLER</div>
-  <div class="status-sub">Open this page on your phone to use it as a game controller. Your inputs are sent to the game in real-time.</div>
-  <button class="cta-btn" id="startBtn" onclick="startSession()">▶ START GAME</button>
-</div>
-
-<!-- ── WAIT SCREEN ── -->
-<div class="status-screen" id="waitScreen" style="display:none">
-  <div class="logo">CTR<span>L</span></div>
-  <div class="wait-icon"></div>
-  <div class="status-title">SESSION ACTIVE</div>
-  <div class="status-sub">Another player is already in a session.<br/>Please wait for them to finish.</div>
-  <div style="display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.72rem;">
-    <div class="pulse-dot"></div>
-    MONITORING...
+  <div class="stitle">ONE-TIME SETUP</div>
+  <div class="field"><label>JSONBIN.IO — BIN ID</label><input id="iBinId" placeholder="6643f1aead19ca34f8..." autocomplete="off"/></div>
+  <div class="field"><label>API KEY (X-Master-Key)</label><input id="iApiKey" placeholder="$2b$10$..." type="password" autocomplete="off"/></div>
+  <button class="cta" onclick="saveSetup()">SAVE &amp; CONTINUE</button>
+  <div class="hint">
+    1. Sign up free at <a href="https://jsonbin.io" target="_blank">jsonbin.io</a><br/>
+    2. Create a new bin with this JSON:<br/>
+    <code>{"sessionActive":false,"sessionTs":0,"sessionToken":null,"input":{"up":false,"down":false,"left":false,"right":false,"a":false}}</code><br/>
+    3. Paste the Bin ID and your Master Key above.<br/>
+    Also paste the same BIN_ID and API_KEY into <b>WebController.cs</b>.
   </div>
 </div>
 
-<!-- ── CONTROLLER ── -->
-<div id="controller">
-  <div class="ctrl-header">
-    <div class="ctrl-title">◈ CTRL — ACTIVE</div>
-    <div class="ctrl-status">
-      <div class="dot"></div>
-      LIVE
-    </div>
-  </div>
+<!-- START -->
+<div class="screen" id="startScreen" style="display:none">
+  <div class="logo">CTR<span>L</span></div>
+  <div class="stitle">REMOTE CONTROLLER</div>
+  <div class="ssub">Use your phone as a game controller over the internet.</div>
+  <button class="cta" id="startBtn" onclick="tryStart()">▶ START GAME</button>
+  <div class="ssub" id="checkMsg" style="display:none;color:var(--accent2)">CHECKING...</div>
+</div>
 
-  <div class="ctrl-body">
-    <!-- D-Pad -->
+<!-- WAIT -->
+<div class="screen" id="waitScreen" style="display:none">
+  <div class="logo">CTR<span>L</span></div>
+  <div class="spinner"></div>
+  <div class="stitle">SESSION OCCUPIED</div>
+  <div class="ssub">Another player is in a session. You will be notified automatically when they finish.</div>
+  <div class="pulse-row"><div class="pdot"></div>WAITING...</div>
+</div>
+
+<!-- CONTROLLER -->
+<div id="ctrlScreen">
+  <div class="chdr">
+    <div class="ctitle">◈ CTRL — ACTIVE</div>
+    <div class="clive"><div class="dot"></div>LIVE</div>
+  </div>
+  <div class="cbody">
     <div class="dpad">
-      <div class="dpad-btn dpad-up"    id="btnUp">
-        <svg class="arrow-svg" viewBox="0 0 24 24"><path d="M12 4l-8 10h16z"/></svg>
-      </div>
-      <div class="dpad-btn dpad-down"  id="btnDown">
-        <svg class="arrow-svg" viewBox="0 0 24 24"><path d="M12 20l8-10H4z"/></svg>
-      </div>
-      <div class="dpad-btn dpad-left"  id="btnLeft">
-        <svg class="arrow-svg" viewBox="0 0 24 24"><path d="M4 12l10-8v16z"/></svg>
-      </div>
-      <div class="dpad-btn dpad-right" id="btnRight">
-        <svg class="arrow-svg" viewBox="0 0 24 24"><path d="M20 12L10 4v16z"/></svg>
-      </div>
-      <div class="dpad-center"><div class="dpad-center-dot"></div></div>
+      <div class="dp dp-u" id="bUp">  <svg class="asv" viewBox="0 0 24 24"><path d="M12 4l-8 10h16z"/></svg></div>
+      <div class="dp dp-d" id="bDown"><svg class="asv" viewBox="0 0 24 24"><path d="M12 20l8-10H4z"/></svg></div>
+      <div class="dp dp-l" id="bLeft"><svg class="asv" viewBox="0 0 24 24"><path d="M4 12l10-8v16z"/></svg></div>
+      <div class="dp dp-r" id="bRight"><svg class="asv" viewBox="0 0 24 24"><path d="M20 12L10 4v16z"/></svg></div>
+      <div class="dp-c"><div class="dp-cd"></div></div>
     </div>
-
-    <!-- A Button -->
-    <div class="action-zone">
-      <div class="btn-a" id="btnA">A</div>
-    </div>
+    <div class="btnA" id="bA">A</div>
   </div>
-
-  <!-- Live input display -->
-  <div class="input-display">
-    <div>
-      <div class="input-label">ACTIVE INPUT</div>
-      <div class="input-value" id="inputDisplay">NONE</div>
-    </div>
-    <div style="text-align:right">
-      <div class="input-label">LAST SENT</div>
-      <div class="input-value" id="lastSent">—</div>
-    </div>
+  <div class="ibox">
+    <div><div class="ilbl">ACTIVE INPUT</div><div class="ival" id="iDisp">NONE</div></div>
+    <div style="text-align:right"><div class="ilbl">SYNCED</div><div class="ival" id="iSent">—</div></div>
   </div>
-
-  <div class="ctrl-footer">
-    <div class="session-badge" id="sessionBadge">SESSION ID: ...</div>
-  </div>
+  <div class="cftr"><div class="sbadge" id="sBadge">SESSION: —</div></div>
 </div>
 
 <script>
-// ─────────────────────────────────────────────────────────────
-//  CONFIG  –  Replace with your GitHub Pages URL after deploy
-// ─────────────────────────────────────────────────────────────
-const BASE_URL = window.location.href.split('?')[0];
+// ═══════════════════════════════════════════════════
+//  CONFIG — set once via setup screen, stored locally
+// ═══════════════════════════════════════════════════
+let BIN_ID  = localStorage.getItem('ctrl_bin') || '';
+let API_KEY = localStorage.getItem('ctrl_key') || '';
+const SESSION_TTL = 10000; // 10 s — heartbeat keeps this fresh
 
-// ─── State ───────────────────────────────────────────────────
-const state = {
-  up: false, down: false, left: false, right: false, a: false,
-  sessionId: null,
-  lastUpdate: Date.now()
-};
+// ── JSONbin API ─────────────────────────────────────
+const binUrl = () => `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-// ─── Session storage keys (localStorage for same-origin) ──────
-const SESSION_KEY  = 'ctrl_session_active';
-const SESSION_TS   = 'ctrl_session_ts';
-const INPUT_KEY    = 'ctrl_input';
-const SESSION_TTL  = 8000; // ms — session expires if not refreshed
-
-function isUnityRequest() {
-  const ua  = navigator.userAgent || '';
-  const url = new URL(window.location.href);
-  return (
-    url.searchParams.has('unity') ||
-    ua.toLowerCase().includes('unityplayer') ||
-    ua.toLowerCase().includes('unity')
-  );
+async function readBin() {
+  const r = await fetch(binUrl() + '/latest', {
+    headers: { 'X-Master-Key': API_KEY, 'X-Bin-Meta': 'false' }
+  });
+  if (!r.ok) throw new Error('JSONbin read ' + r.status);
+  return r.json(); // already the record with X-Bin-Meta:false
 }
 
-// ─── UNITY MODE ──────────────────────────────────────────────
-// When Unity opens ?unity=1, the page returns a JSON blob and nothing else.
-// We detect this BEFORE any UI renders.
-if (isUnityRequest()) {
-  // Clear body, output JSON
-  document.body.style.cssText = 'background:#000;color:#0f0;font-family:monospace;padding:20px';
+async function writeBin(obj) {
+  const r = await fetch(binUrl(), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+    body: JSON.stringify(obj)
+  });
+  if (!r.ok) throw new Error('JSONbin write ' + r.status);
+}
 
-  function serveUnity() {
-    const rawInput  = localStorage.getItem(INPUT_KEY) || '{}';
-    let   inputData = {};
-    try { inputData = JSON.parse(rawInput); } catch(e){}
+// ── Screen helper ───────────────────────────────────
+function show(id) {
+  ['setupScreen','startScreen','waitScreen','ctrlScreen'].forEach(s => {
+    document.getElementById(s).style.display = (s === id) ? 'flex' : 'none';
+  });
+}
 
-    const sessionAlive = sessionAlive_check();
-    const response = {
-      sessionActive: sessionAlive,
+// ═══════════════════════════════════════════════════
+//  UNITY DETECTION
+//  Unity polls: https://yourpage.html?unity=1
+//  The page responds with ONLY a JSON string.
+// ═══════════════════════════════════════════════════
+const IS_UNITY = new URLSearchParams(location.search).has('unity');
+
+async function serveUnity() {
+  // Replace entire document with plain JSON
+  try {
+    const record = await readBin();
+    const now   = Date.now();
+    const alive = record.sessionActive && (now - record.sessionTs) < SESSION_TTL;
+    const out = {
+      sessionActive: alive,
       input: {
-        up:    !!inputData.up,
-        down:  !!inputData.down,
-        left:  !!inputData.left,
-        right: !!inputData.right,
-        a:     !!inputData.a
+        up:    !!record.input?.up,
+        down:  !!record.input?.down,
+        left:  !!record.input?.left,
+        right: !!record.input?.right,
+        a:     !!record.input?.a
       },
-      timestamp: Date.now()
+      timestamp: now
     };
-
-    // Overwrite the entire page body with just the JSON
-    document.body.innerHTML = '<pre>' + JSON.stringify(response) + '</pre>';
-    setTimeout(serveUnity, 100); // auto-refresh every 100 ms
+    document.open('text/plain');
+    document.write(JSON.stringify(out));
+    document.close();
+  } catch(e) {
+    document.open('text/plain');
+    document.write(JSON.stringify({ error: e.message }));
+    document.close();
   }
+}
 
-  function sessionAlive_check() {
-    const ts = parseInt(localStorage.getItem(SESSION_TS) || '0', 10);
-    return (Date.now() - ts) < SESSION_TTL;
-  }
+// ═══════════════════════════════════════════════════
+//  SETUP SCREEN
+// ═══════════════════════════════════════════════════
+function saveSetup() {
+  const b = document.getElementById('iBinId').value.trim();
+  const k = document.getElementById('iApiKey').value.trim();
+  if (!b || !k) { alert('Fill in both fields.'); return; }
+  BIN_ID = b; API_KEY = k;
+  localStorage.setItem('ctrl_bin', b);
+  localStorage.setItem('ctrl_key', k);
+  show('startScreen');
+}
 
-  serveUnity();
+// ═══════════════════════════════════════════════════
+//  SESSION LOGIC
+// ═══════════════════════════════════════════════════
+let hbTimer   = null;
+let waitTimer  = null;
+let myToken    = null;
+const inp = { up:false, down:false, left:false, right:false, a:false };
 
-} else {
-  // ─── BROWSER / PLAYER MODE ─────────────────────────────────
-  function sessionAliveCheck() {
-    const ts = parseInt(localStorage.getItem(SESSION_TS) || '0', 10);
-    return (Date.now() - ts) < SESSION_TTL;
-  }
-
-  function generateId() {
-    return Math.random().toString(36).substring(2, 8).toUpperCase();
-  }
-
-  function startSession() {
-    if (sessionAliveCheck()) {
-      // Someone already playing
-      showWait();
-      return;
+async function tryStart() {
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('checkMsg').style.display = 'block';
+  try {
+    const record = await readBin();
+    const now    = Date.now();
+    const alive  = record.sessionActive && (now - record.sessionTs) < SESSION_TTL;
+    if (alive) {
+      show('waitScreen');
+      startWaitPoll();
+    } else {
+      myToken = Math.random().toString(36).slice(2,8).toUpperCase();
+      await writeBin({ sessionActive:true, sessionTs:Date.now(), sessionToken:myToken,
+                       input:{up:false,down:false,left:false,right:false,a:false} });
+      document.getElementById('sBadge').textContent = 'SESSION: ' + myToken;
+      show('ctrlScreen');
+      bindControls();
+      startHb();
     }
-    const sid = generateId();
-    state.sessionId = sid;
-    localStorage.setItem(SESSION_KEY, sid);
-    localStorage.setItem(SESSION_TS, Date.now().toString());
-    localStorage.setItem(INPUT_KEY, JSON.stringify({up:false,down:false,left:false,right:false,a:false}));
-    showController();
+  } catch(e) {
+    alert('Connection error: ' + e.message);
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('checkMsg').style.display = 'none';
   }
+}
 
-  function showController() {
-    document.getElementById('startScreen').style.display = 'none';
-    document.getElementById('waitScreen').style.display  = 'none';
-    document.getElementById('controller').style.display  = 'flex';
-    document.getElementById('sessionBadge').textContent  = 'SESSION ID: ' + state.sessionId;
-    startHeartbeat();
-    bindControls();
-  }
+function startHb() {
+  hbTimer = setInterval(async () => {
+    try {
+      await writeBin({ sessionActive:true, sessionTs:Date.now(),
+                       sessionToken:myToken, input:{...inp} });
+      updateDisp();
+    } catch(e) {}
+  }, 300);
+  window.addEventListener('beforeunload', releaseSession);
+}
 
-  function showWait() {
-    document.getElementById('startScreen').style.display = 'none';
-    document.getElementById('waitScreen').style.display  = 'flex';
-    document.getElementById('controller').style.display  = 'none';
-    // Poll until the session is free
-    const poll = setInterval(() => {
-      if (!sessionAliveCheck()) {
-        clearInterval(poll);
-        document.getElementById('waitScreen').style.display = 'none';
-        document.getElementById('startScreen').style.display = 'flex';
+async function releaseSession() {
+  clearInterval(hbTimer);
+  try {
+    await writeBin({ sessionActive:false, sessionTs:0, sessionToken:null,
+                     input:{up:false,down:false,left:false,right:false,a:false} });
+  } catch(e) {}
+}
+
+function startWaitPoll() {
+  waitTimer = setInterval(async () => {
+    try {
+      const record = await readBin();
+      const now    = Date.now();
+      const alive  = record.sessionActive && (now - record.sessionTs) < SESSION_TTL;
+      if (!alive) {
+        clearInterval(waitTimer);
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('checkMsg').style.display = 'none';
+        show('startScreen');
       }
-    }, 1500);
-  }
+    } catch(e) {}
+  }, 2500);
+}
 
-  // Check on load
-  window.addEventListener('load', () => {
-    if (sessionAliveCheck()) {
-      showWait();
-    }
+// ═══════════════════════════════════════════════════
+//  INPUT BINDING
+// ═══════════════════════════════════════════════════
+function bindControls() {
+  [
+    ['bUp','up'],['bDown','down'],['bLeft','left'],['bRight','right'],['bA','a']
+  ].forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    const dn = e => { e.preventDefault(); inp[key]=true;  el.classList.add('pressed'); };
+    const up = e => { e.preventDefault(); inp[key]=false; el.classList.remove('pressed'); };
+    el.addEventListener('touchstart',  dn, {passive:false});
+    el.addEventListener('touchend',    up, {passive:false});
+    el.addEventListener('touchcancel', up, {passive:false});
+    el.addEventListener('mousedown', dn);
+    el.addEventListener('mouseup',   up);
+    el.addEventListener('mouseleave',up);
   });
 
-  // ─── Heartbeat: keep session alive ─────────────────────────
-  function startHeartbeat() {
-    const hb = setInterval(() => {
-      if (!state.sessionId) { clearInterval(hb); return; }
-      localStorage.setItem(SESSION_TS, Date.now().toString());
-      saveInput();
-    }, 200);
-
-    // Cleanup on tab close
-    window.addEventListener('beforeunload', () => {
-      localStorage.removeItem(SESSION_KEY);
-      localStorage.removeItem(SESSION_TS);
-      localStorage.removeItem(INPUT_KEY);
-    });
-  }
-
-  function saveInput() {
-    localStorage.setItem(INPUT_KEY, JSON.stringify({
-      up:    state.up,
-      down:  state.down,
-      left:  state.left,
-      right: state.right,
-      a:     state.a
-    }));
-
-    // Update live display
-    const active = Object.entries({up:state.up,down:state.down,left:state.left,right:state.right,a:state.a})
-      .filter(([,v])=>v).map(([k])=>k.toUpperCase()).join(' + ') || 'NONE';
-    document.getElementById('inputDisplay').textContent = active;
-    if (active !== 'NONE') {
-      const now = new Date();
-      document.getElementById('lastSent').textContent =
-        now.getHours().toString().padStart(2,'0') + ':' +
-        now.getMinutes().toString().padStart(2,'0') + ':' +
-        now.getSeconds().toString().padStart(2,'0');
-    }
-  }
-
-  // ─── Button Binding ─────────────────────────────────────────
-  function bindControls() {
-    const btns = [
-      { id: 'btnUp',    key: 'up' },
-      { id: 'btnDown',  key: 'down' },
-      { id: 'btnLeft',  key: 'left' },
-      { id: 'btnRight', key: 'right' },
-      { id: 'btnA',     key: 'a' },
-    ];
-
-    btns.forEach(({ id, key }) => {
-      const el = document.getElementById(id);
-
-      const press = (e) => {
-        e.preventDefault();
-        state[key] = true;
-        el.classList.add('pressed');
-        saveInput();
-      };
-      const release = (e) => {
-        e.preventDefault();
-        state[key] = false;
-        el.classList.remove('pressed');
-        saveInput();
-      };
-
-      el.addEventListener('touchstart',  press,   { passive: false });
-      el.addEventListener('touchend',    release, { passive: false });
-      el.addEventListener('touchcancel', release, { passive: false });
-      el.addEventListener('mousedown',   press);
-      el.addEventListener('mouseup',     release);
-      el.addEventListener('mouseleave',  release);
-    });
-
-    // Keyboard fallback
-    const keyMap = { ArrowUp:'up', ArrowDown:'down', ArrowLeft:'left', ArrowRight:'right', KeyA:'a', Space:'a' };
-    window.addEventListener('keydown', e => {
-      const key = keyMap[e.code];
-      if (!key) return;
-      e.preventDefault();
-      state[key] = true;
-      document.getElementById('btn' + key.charAt(0).toUpperCase() + key.slice(1))?.classList.add('pressed');
-      saveInput();
-    });
-    window.addEventListener('keyup', e => {
-      const key = keyMap[e.code];
-      if (!key) return;
-      state[key] = false;
-      document.getElementById('btn' + key.charAt(0).toUpperCase() + key.slice(1))?.classList.remove('pressed');
-      saveInput();
-    });
-  }
+  const km = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyA:'a',Space:'a'};
+  window.addEventListener('keydown', e => {
+    const k=km[e.code]; if(!k) return; e.preventDefault(); inp[k]=true;
+    document.getElementById('b'+k[0].toUpperCase()+k.slice(1))?.classList.add('pressed');
+  });
+  window.addEventListener('keyup', e => {
+    const k=km[e.code]; if(!k) return; inp[k]=false;
+    document.getElementById('b'+k[0].toUpperCase()+k.slice(1))?.classList.remove('pressed');
+  });
 }
+
+function updateDisp() {
+  const a = Object.entries(inp).filter(([,v])=>v).map(([k])=>k.toUpperCase()).join(' + ') || 'NONE';
+  document.getElementById('iDisp').textContent = a;
+  const n = new Date();
+  document.getElementById('iSent').textContent =
+    n.getHours().toString().padStart(2,'0')+':'+
+    n.getMinutes().toString().padStart(2,'0')+':'+
+    n.getSeconds().toString().padStart(2,'0');
+}
+
+// ═══════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════
+window.addEventListener('load', async () => {
+  if (IS_UNITY) { await serveUnity(); return; }
+  show(!BIN_ID || !API_KEY ? 'setupScreen' : 'startScreen');
+});
 </script>
 </body>
 </html>
