@@ -222,6 +222,71 @@
     padding: 8px 0;
   }
 
+  /* ── SESSION ENDED OVERLAY ── */
+  #sessionEndedOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(7,8,13,.92);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    animation: fadeUp .4s ease;
+  }
+  #sessionEndedOverlay.visible { display: flex; }
+  .ended-icon {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(2.5rem,8vw,4.5rem);
+    color: var(--accent);
+    text-shadow: var(--glow-y);
+    line-height: 1;
+  }
+  .ended-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(.9rem,2.5vw,1.4rem);
+    font-weight: 900;
+    letter-spacing: .22em;
+    color: var(--accent);
+    text-shadow: var(--glow-y);
+  }
+  .ended-sub {
+    font-size: clamp(.65rem,1.6vw,.85rem);
+    letter-spacing: .14em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .ended-score {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.1rem,3vw,1.8rem);
+    font-weight: 900;
+    color: var(--blue);
+    text-shadow: var(--glow-b);
+    letter-spacing: .1em;
+  }
+  .ended-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(.55rem,1.4vw,.7rem);
+    font-weight: 900;
+    letter-spacing: .16em;
+    padding: 10px 24px;
+    cursor: pointer;
+    clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+    transition: border-color .15s, color .15s, box-shadow .15s;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); box-shadow: var(--glow-y); }
+
   /* ── CONTROLLER LAYOUT ── */
   #ctrl {
     display: none;
@@ -274,6 +339,25 @@
     letter-spacing: .08em;
     opacity: .5;
   }
+
+  /* ── Timer bar ── */
+  .timer-bar-wrap {
+    width: 120px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+  .timer-bar-fill {
+    height: 100%;
+    width: 100%;
+    background: var(--accent);
+    box-shadow: var(--glow-y);
+    transform-origin: left;
+    transition: background .3s;
+  }
+  .timer-bar-fill.urgent { background: var(--red); box-shadow: var(--glow-r); }
 
   .readout {
     background: var(--panel);
@@ -378,6 +462,18 @@
   <p>ROTATE TO LANDSCAPE</p>
 </div>
 
+<!-- Session Ended Overlay -->
+<div id="sessionEndedOverlay">
+  <div class="ended-icon">⏱</div>
+  <div class="ended-title">SESSION ENDED</div>
+  <div class="ended-sub">Time's up — your score has been saved</div>
+  <div class="ended-score" id="endedScoreDisplay" style="display:none"></div>
+  <div class="ended-actions">
+    <button class="cta" onclick="playAgain()">▶ PLAY AGAIN</button>
+    <button class="btn-outline" onclick="location.reload()">↺ REFRESH PAGE</button>
+  </div>
+</div>
+
 <!-- App root -->
 <div id="app">
 
@@ -447,6 +543,9 @@
       <div class="ctrl-title">◈ CTRL</div>
       <div class="live-badge"><div class="dot"></div>LIVE</div>
       <div class="player-badge" id="pBadge">—</div>
+      <div class="timer-bar-wrap">
+        <div class="timer-bar-fill" id="timerBarFill"></div>
+      </div>
       <div class="readout">
         <span>INPUT&nbsp;<b id="iDisp">—</b></span>
         <span>SYNC&nbsp;<b id="iSent">—</b></span>
@@ -468,9 +567,9 @@
 // ══════════════════════════════════════════════════════
 const FB       = 'https://clawmachine-cde3e-default-rtdb.firebaseio.com';
 const PATH     = '/ctrl';
-const LB_PATH  = '/leaderboard';   // separate node for scores
+const LB_PATH  = '/leaderboard';
 const TTL      = 10000;
-const LB_MAX   = 10;               // how many entries to store/show
+const LB_MAX   = 10;
 
 const fbUrl    = ()  => FB + PATH + '.json';
 const lbUrl    = ()  => FB + LB_PATH + '.json';
@@ -488,15 +587,6 @@ async function fbWrite(url, data) {
     body:    JSON.stringify(data)
   });
   if (!r.ok) throw new Error('Write ' + r.status);
-}
-
-async function fbPatch(url, data) {
-  const r = await fetch(url, {
-    method:  'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(data)
-  });
-  if (!r.ok) throw new Error('Patch ' + r.status);
 }
 
 // ══════════════════════════════════════════════════════
@@ -553,7 +643,6 @@ async function loadLeaderboard() {
       return;
     }
 
-    // data is an object keyed by timestamp; sort by score desc
     const entries = Object.values(data)
       .sort((a,b) => (b.score||0) - (a.score||0))
       .slice(0, LB_MAX);
@@ -583,14 +672,79 @@ function escHtml(s) {
 }
 
 // ══════════════════════════════════════════════════════
-//  SESSION
+//  SESSION STATE
 // ══════════════════════════════════════════════════════
-let hbTimer   = null;
-let waitTimer  = null;
-let myToken   = null;
-let myName    = '';
+let hbTimer        = null;
+let waitTimer      = null;
+let sessionMonitor = null;
+let myToken        = null;
+let myName         = '';
+let sessionKilled  = false;   // guard: prevent double-trigger
+
 const inp = { up:false, down:false, left:false, right:false, a:false };
 
+// ══════════════════════════════════════════════════════
+//  SESSION MONITOR — detects when Unity kills the session
+// ══════════════════════════════════════════════════════
+function startSessionMonitor() {
+  sessionKilled = false;
+  sessionMonitor = setInterval(async () => {
+    if (sessionKilled) return;
+    try {
+      const d   = await fbRead();
+      const now = Date.now();
+      // Alive = sessionActive flag is true AND heartbeat is fresh
+      const alive = d && d.sessionActive && (now - (d.sessionTs || 0)) < TTL;
+      if (!alive) {
+        handleSessionKilled('TIME UP');
+      }
+    } catch(e) { /* network hiccup — keep monitoring */ }
+  }, 1500);
+}
+
+function stopSessionMonitor() {
+  clearInterval(sessionMonitor);
+  sessionMonitor = null;
+}
+
+async function handleSessionKilled(reason = 'SESSION ENDED') {
+  if (sessionKilled) return;   // run once
+  sessionKilled = true;
+
+  stopSessionMonitor();
+  clearInterval(hbTimer);
+  hbTimer = null;
+
+  // Kill all button states
+  Object.keys(inp).forEach(k => inp[k] = false);
+  ['bUp','bDown','bLeft','bRight','bA'].forEach(id => {
+    document.getElementById(id)?.classList.remove('on');
+  });
+
+  // Show the "session ended" overlay on top of the controller
+  const overlay = document.getElementById('sessionEndedOverlay');
+  overlay.classList.add('visible');
+}
+
+// Called by "PLAY AGAIN" button on the overlay
+async function playAgain() {
+  const overlay = document.getElementById('sessionEndedOverlay');
+  overlay.classList.remove('visible');
+
+  // Reset UI
+  myToken = null;
+  myName  = '';
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('startMsg').textContent = '✓ SESSION ENDED — ENTER YOUR NAME TO PLAY AGAIN';
+  document.getElementById('nameInput').value = '';
+
+  show('startScreen');
+  await loadLeaderboard();
+}
+
+// ══════════════════════════════════════════════════════
+//  START SESSION
+// ══════════════════════════════════════════════════════
 async function tryStart() {
   const btn      = document.getElementById('startBtn');
   const msg      = document.getElementById('startMsg');
@@ -628,6 +782,7 @@ async function tryStart() {
       show('ctrl');
       bindControls();
       startHb();
+      startSessionMonitor();   // watch for Unity-side session termination
     }
   } catch(e) {
     btn.disabled = false;
@@ -635,8 +790,12 @@ async function tryStart() {
   }
 }
 
+// ══════════════════════════════════════════════════════
+//  HEARTBEAT
+// ══════════════════════════════════════════════════════
 function startHb() {
   hbTimer = setInterval(async () => {
+    if (sessionKilled) return;
     try {
       await fbWrite(fbUrl(), {
         sessionActive: true,
@@ -648,11 +807,14 @@ function startHb() {
       refreshDisp();
     } catch(e) {}
   }, 300);
+
   window.addEventListener('beforeunload', releaseSession);
 }
 
 async function releaseSession() {
+  stopSessionMonitor();
   clearInterval(hbTimer);
+  hbTimer = null;
   try {
     await fbWrite(fbUrl(), {
       sessionActive: false, sessionTs: 0, sessionToken: null, playerName: null,
@@ -661,6 +823,9 @@ async function releaseSession() {
   } catch(e) {}
 }
 
+// ══════════════════════════════════════════════════════
+//  WAIT POLL (queue while session occupied)
+// ══════════════════════════════════════════════════════
 function startWaitPoll() {
   waitTimer = setInterval(async () => {
     try {
@@ -672,7 +837,7 @@ function startWaitPoll() {
         document.getElementById('startBtn').disabled = false;
         document.getElementById('startMsg').textContent = '';
         show('startScreen');
-        loadLeaderboard(); // refresh leaderboard when waiting ends
+        loadLeaderboard();
       }
     } catch(e) {}
   }, 2500);
@@ -685,7 +850,7 @@ function bindControls() {
   [['bUp','up'],['bDown','down'],['bLeft','left'],['bRight','right'],['bA','a']]
   .forEach(([id, key]) => {
     const el = document.getElementById(id);
-    const dn = e => { e.preventDefault(); inp[key]=true;  el.classList.add('on'); };
+    const dn = e => { e.preventDefault(); if(sessionKilled) return; inp[key]=true;  el.classList.add('on'); };
     const up = e => { e.preventDefault(); inp[key]=false; el.classList.remove('on'); };
     el.addEventListener('touchstart',  dn, {passive:false});
     el.addEventListener('touchend',    up, {passive:false});
@@ -697,6 +862,7 @@ function bindControls() {
 
   const km = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyA:'a',Space:'a'};
   window.addEventListener('keydown', e => {
+    if (sessionKilled) return;
     const k=km[e.code]; if(!k) return; e.preventDefault(); inp[k]=true;
     document.getElementById('b'+k[0].toUpperCase()+k.slice(1))?.classList.add('on');
   });
