@@ -33,13 +33,11 @@
     touch-action: none;
   }
 
-  /* Force landscape */
   @media (orientation: portrait) {
     #rotateMsg  { display: flex !important; }
     #app        { display: none !important; }
   }
 
-  /* Rotate nudge */
   #rotateMsg {
     display: none;
     position: fixed; inset: 0; z-index: 999;
@@ -50,20 +48,15 @@
     text-align: center;
   }
   #rotateMsg svg { width: 64px; height: 64px; fill: var(--accent); animation: tilt 1.4s ease-in-out infinite; }
-  @keyframes tilt {
-    0%,100% { transform: rotate(-15deg); }
-    50%      { transform: rotate(15deg); }
-  }
+  @keyframes tilt { 0%,100% { transform: rotate(-15deg); } 50% { transform: rotate(15deg); } }
   #rotateMsg p { font-family:'Orbitron',sans-serif; font-size:.9rem; letter-spacing:.15em; color:var(--accent); }
 
-  /* ── APP SHELL ─────────────────────────────────────── */
   #app {
     display: flex;
     width: 100vw; height: 100vh;
     align-items: center; justify-content: center;
   }
 
-  /* ── SCREENS (start / wait) ────────────────────────── */
   .screen {
     display: flex;
     flex-direction: column;
@@ -92,6 +85,41 @@
     color: var(--muted);
     text-transform: uppercase;
   }
+
+  /* ── Name input ── */
+  .name-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    max-width: 280px;
+  }
+  .name-label {
+    font-size: clamp(.55rem,1.4vw,.72rem);
+    letter-spacing: .18em;
+    color: var(--muted);
+    text-transform: uppercase;
+    align-self: flex-start;
+    padding-left: 4px;
+  }
+  .name-input {
+    width: 100%;
+    background: var(--btn);
+    border: 1.5px solid var(--border);
+    color: var(--accent);
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(.7rem,1.8vw,.9rem);
+    font-weight: 800;
+    letter-spacing: .14em;
+    padding: 10px 16px;
+    outline: none;
+    clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+    transition: border-color .15s, box-shadow .15s;
+    text-transform: uppercase;
+  }
+  .name-input::placeholder { color: var(--muted); opacity: .6; }
+  .name-input:focus { border-color: var(--accent); box-shadow: var(--glow-y); }
 
   .cta {
     margin-top: 8px;
@@ -125,7 +153,76 @@
   .pdot { width:8px; height:8px; border-radius:50%; background:var(--accent); box-shadow:var(--glow-y); animation:pulse 1.2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.25;transform:scale(.5)} }
 
-  /* ── CONTROLLER LAYOUT ─────────────────────────────── */
+  /* ── LEADERBOARD ── */
+  .lb-wrap {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .lb-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(.55rem,1.5vw,.75rem);
+    letter-spacing: .22em;
+    color: var(--blue);
+    text-shadow: var(--glow-b);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .lb-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--btn);
+    border: 1px solid var(--border);
+    padding: 7px 14px;
+    clip-path: polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+    animation: fadeUp .3s ease both;
+  }
+  .lb-row:nth-child(2) { animation-delay:.04s; }
+  .lb-row:nth-child(3) { animation-delay:.08s; }
+  .lb-row:nth-child(4) { animation-delay:.12s; }
+  .lb-row:nth-child(5) { animation-delay:.16s; }
+  .lb-rank {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(.5rem,1.3vw,.65rem);
+    font-weight: 900;
+    color: var(--muted);
+    min-width: 20px;
+    text-align: center;
+  }
+  .lb-row.top1 .lb-rank { color: var(--accent); text-shadow: var(--glow-y); }
+  .lb-row.top2 .lb-rank { color: #c0c0c0; }
+  .lb-row.top3 .lb-rank { color: #cd7f32; }
+  .lb-name {
+    flex: 1;
+    font-size: clamp(.65rem,1.6vw,.85rem);
+    letter-spacing: .1em;
+    color: var(--text);
+    text-transform: uppercase;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lb-score {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(.6rem,1.5vw,.78rem);
+    font-weight: 900;
+    color: var(--accent);
+    text-shadow: var(--glow-y);
+    white-space: nowrap;
+  }
+  .lb-empty {
+    font-size: .7rem;
+    color: var(--muted);
+    letter-spacing: .12em;
+    text-align: center;
+    opacity: .6;
+    padding: 8px 0;
+  }
+
+  /* ── CONTROLLER LAYOUT ── */
   #ctrl {
     display: none;
     width: 100vw; height: 100vh;
@@ -136,7 +233,6 @@
     animation: fadeUp .35s ease;
   }
 
-  /* centre strip */
   .centre {
     display: flex;
     flex-direction: column;
@@ -160,6 +256,18 @@
   }
   .live-badge .dot { width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:var(--glow-y);animation:pulse 1.5s infinite; }
 
+  .player-badge {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(.42rem,1.1vw,.6rem);
+    color: var(--blue);
+    letter-spacing: .1em;
+    text-shadow: var(--glow-b);
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .session-badge {
     font-size: clamp(.4rem,1vw,.58rem);
     color: var(--muted);
@@ -167,7 +275,6 @@
     opacity: .5;
   }
 
-  /* Input readout bar */
   .readout {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -181,7 +288,7 @@
   .readout span { color: var(--muted); }
   .readout b    { color: var(--accent); font-weight: 600; }
 
-  /* ── D-PAD ─────────────────────────────────────────── */
+  /* ── D-PAD ── */
   .dpad-wrap {
     display: flex;
     align-items: center; justify-content: center;
@@ -205,7 +312,6 @@
     transition: background .07s, color .07s, box-shadow .07s;
   }
 
-  /* size each arm as 1/3 of the dpad */
   .dp-u, .dp-d { width:33.33%; height:33.33%; left:33.33%; }
   .dp-l, .dp-r { width:33.33%; height:33.33%; top:33.33%; }
   .dp-u { top:0;     clip-path:polygon(0 20%,50% 0,100% 20%,100% 100%,0 100%); }
@@ -226,7 +332,7 @@
 
   .arrow { width: clamp(14px,2.2vw,20px); height: clamp(14px,2.2vw,20px); fill:currentColor; pointer-events:none; }
 
-  /* ── A BUTTON ──────────────────────────────────────── */
+  /* ── A BUTTON ── */
   .action-wrap {
     display: flex;
     align-items: center; justify-content: center;
@@ -251,7 +357,6 @@
   }
   .btn-a.on { background:var(--red); color:#fff; box-shadow:var(--glow-r); }
 
-  /* decorative corner lines */
   #ctrl::before, #ctrl::after {
     content: '';
     position: absolute;
@@ -280,8 +385,28 @@
   <div class="screen" id="startScreen">
     <div class="logo">CTR<em>L</em></div>
     <div class="subtitle">Remote Game Controller</div>
+
+    <div class="name-wrap">
+      <div class="name-label">◈ Player Name</div>
+      <input
+        class="name-input"
+        id="nameInput"
+        type="text"
+        maxlength="16"
+        placeholder="ENTER NAME"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </div>
+
     <button class="cta" id="startBtn" onclick="tryStart()">▶ START SESSION</button>
     <div style="font-size:.7rem;color:var(--muted);letter-spacing:.08em;min-height:1em" id="startMsg"></div>
+
+    <!-- Leaderboard (shown on start screen) -->
+    <div class="lb-wrap" id="lbWrap">
+      <div class="lb-title">◈ LEADERBOARD</div>
+      <div id="lbRows"><div class="lb-empty">LOADING...</div></div>
+    </div>
   </div>
 
   <!-- WAIT -->
@@ -321,6 +446,7 @@
     <div class="centre">
       <div class="ctrl-title">◈ CTRL</div>
       <div class="live-badge"><div class="dot"></div>LIVE</div>
+      <div class="player-badge" id="pBadge">—</div>
       <div class="readout">
         <span>INPUT&nbsp;<b id="iDisp">—</b></span>
         <span>SYNC&nbsp;<b id="iSent">—</b></span>
@@ -338,27 +464,39 @@
 
 <script>
 // ══════════════════════════════════════════════════════
-//  CONFIG — hardcoded Firebase project
+//  CONFIG
 // ══════════════════════════════════════════════════════
-const FB   = 'https://clawmachine-cde3e-default-rtdb.firebaseio.com';
-const PATH = '/ctrl';           // node inside the DB
-const TTL  = 10000;             // session heartbeat window (ms)
+const FB       = 'https://clawmachine-cde3e-default-rtdb.firebaseio.com';
+const PATH     = '/ctrl';
+const LB_PATH  = '/leaderboard';   // separate node for scores
+const TTL      = 10000;
+const LB_MAX   = 10;               // how many entries to store/show
 
-const fbUrl = () => FB + PATH + '.json';
+const fbUrl    = ()  => FB + PATH + '.json';
+const lbUrl    = ()  => FB + LB_PATH + '.json';
 
-async function fbRead() {
-  const r = await fetch(fbUrl());
+async function fbRead(url = fbUrl()) {
+  const r = await fetch(url);
   if (!r.ok) throw new Error('Read ' + r.status);
-  return r.json(); // null if node absent
+  return r.json();
 }
 
-async function fbWrite(data) {
-  const r = await fetch(fbUrl(), {
+async function fbWrite(url, data) {
+  const r = await fetch(url, {
     method:  'PUT',
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify(data)
   });
   if (!r.ok) throw new Error('Write ' + r.status);
+}
+
+async function fbPatch(url, data) {
+  const r = await fetch(url, {
+    method:  'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(data)
+  });
+  if (!r.ok) throw new Error('Patch ' + r.status);
 }
 
 // ══════════════════════════════════════════════════════
@@ -374,6 +512,7 @@ async function serveUnity() {
     const alive = d && d.sessionActive && (now - (d.sessionTs || 0)) < TTL;
     out = {
       sessionActive: !!alive,
+      playerName: alive ? (d.playerName || '') : '',
       input: {
         up:    !!(alive && d.input?.up),
         down:  !!(alive && d.input?.down),
@@ -384,7 +523,7 @@ async function serveUnity() {
       timestamp: now
     };
   } catch(e) {
-    out = { error: e.message, sessionActive:false,
+    out = { error: e.message, sessionActive:false, playerName:'',
             input:{up:false,down:false,left:false,right:false,a:false} };
   }
   document.open('text/plain');
@@ -398,8 +537,49 @@ async function serveUnity() {
 function show(id) {
   ['startScreen','waitScreen','ctrl'].forEach(s => {
     const el = document.getElementById(s);
-    el.style.display = s === id ? (s === 'ctrl' ? 'flex' : 'flex') : 'none';
+    el.style.display = s === id ? 'flex' : 'none';
   });
+}
+
+// ══════════════════════════════════════════════════════
+//  LEADERBOARD
+// ══════════════════════════════════════════════════════
+async function loadLeaderboard() {
+  const container = document.getElementById('lbRows');
+  try {
+    const data = await fbRead(lbUrl());
+    if (!data) {
+      container.innerHTML = '<div class="lb-empty">NO SCORES YET — BE THE FIRST!</div>';
+      return;
+    }
+
+    // data is an object keyed by timestamp; sort by score desc
+    const entries = Object.values(data)
+      .sort((a,b) => (b.score||0) - (a.score||0))
+      .slice(0, LB_MAX);
+
+    if (!entries.length) {
+      container.innerHTML = '<div class="lb-empty">NO SCORES YET — BE THE FIRST!</div>';
+      return;
+    }
+
+    container.innerHTML = entries.map((e, i) => {
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+      const cls   = i === 0 ? 'lb-row top1' : i === 1 ? 'lb-row top2' : i === 2 ? 'lb-row top3' : 'lb-row';
+      return `<div class="${cls}">
+        <div class="lb-rank">${medal}</div>
+        <div class="lb-name">${escHtml(e.name || 'ANON')}</div>
+        <div class="lb-score">${(e.score||0).toLocaleString()} PTS</div>
+      </div>`;
+    }).join('');
+
+  } catch(ex) {
+    container.innerHTML = '<div class="lb-empty">COULD NOT LOAD LEADERBOARD</div>';
+  }
+}
+
+function escHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 // ══════════════════════════════════════════════════════
@@ -408,13 +588,25 @@ function show(id) {
 let hbTimer   = null;
 let waitTimer  = null;
 let myToken   = null;
+let myName    = '';
 const inp = { up:false, down:false, left:false, right:false, a:false };
 
 async function tryStart() {
-  const btn = document.getElementById('startBtn');
-  const msg = document.getElementById('startMsg');
+  const btn      = document.getElementById('startBtn');
+  const msg      = document.getElementById('startMsg');
+  const nameEl   = document.getElementById('nameInput');
+  const rawName  = nameEl.value.trim().toUpperCase();
+
+  if (!rawName) {
+    msg.textContent = '✗ ENTER YOUR NAME FIRST';
+    nameEl.focus();
+    return;
+  }
+
+  myName = rawName;
   btn.disabled = true;
   msg.textContent = 'CHECKING...';
+
   try {
     const d    = await fbRead();
     const now  = Date.now();
@@ -424,10 +616,15 @@ async function tryStart() {
       startWaitPoll();
     } else {
       myToken = Math.random().toString(36).slice(2,8).toUpperCase();
-      await fbWrite({ sessionActive:true, sessionTs:Date.now(),
-                      sessionToken:myToken,
-                      input:{up:false,down:false,left:false,right:false,a:false} });
-      document.getElementById('sBadge').textContent = 'SID ' + myToken;
+      await fbWrite(fbUrl(), {
+        sessionActive: true,
+        sessionTs:     Date.now(),
+        sessionToken:  myToken,
+        playerName:    myName,
+        input: { up:false, down:false, left:false, right:false, a:false }
+      });
+      document.getElementById('sBadge').textContent  = 'SID ' + myToken;
+      document.getElementById('pBadge').textContent  = '▶ ' + myName;
       show('ctrl');
       bindControls();
       startHb();
@@ -441,8 +638,13 @@ async function tryStart() {
 function startHb() {
   hbTimer = setInterval(async () => {
     try {
-      await fbWrite({ sessionActive:true, sessionTs:Date.now(),
-                      sessionToken:myToken, input:{...inp} });
+      await fbWrite(fbUrl(), {
+        sessionActive: true,
+        sessionTs:     Date.now(),
+        sessionToken:  myToken,
+        playerName:    myName,
+        input: { ...inp }
+      });
       refreshDisp();
     } catch(e) {}
   }, 300);
@@ -452,8 +654,10 @@ function startHb() {
 async function releaseSession() {
   clearInterval(hbTimer);
   try {
-    await fbWrite({ sessionActive:false, sessionTs:0, sessionToken:null,
-                    input:{up:false,down:false,left:false,right:false,a:false} });
+    await fbWrite(fbUrl(), {
+      sessionActive: false, sessionTs: 0, sessionToken: null, playerName: null,
+      input: { up:false, down:false, left:false, right:false, a:false }
+    });
   } catch(e) {}
 }
 
@@ -468,6 +672,7 @@ function startWaitPoll() {
         document.getElementById('startBtn').disabled = false;
         document.getElementById('startMsg').textContent = '';
         show('startScreen');
+        loadLeaderboard(); // refresh leaderboard when waiting ends
       }
     } catch(e) {}
   }, 2500);
@@ -490,7 +695,6 @@ function bindControls() {
     el.addEventListener('mouseleave',up);
   });
 
-  // Keyboard (desktop testing)
   const km = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyA:'a',Space:'a'};
   window.addEventListener('keydown', e => {
     const k=km[e.code]; if(!k) return; e.preventDefault(); inp[k]=true;
@@ -518,6 +722,7 @@ function refreshDisp() {
 window.addEventListener('load', async () => {
   if (IS_UNITY) { await serveUnity(); return; }
   show('startScreen');
+  loadLeaderboard();
 });
 </script>
 </body>
