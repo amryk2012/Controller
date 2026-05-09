@@ -14,103 +14,156 @@
     --glow2:0 0 18px rgba(0,180,216,.45);
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;position:relative}
-  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,245,160,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,160,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
-  body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);pointer-events:none;z-index:0}
+  body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;
+    min-height:100dvh;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;overflow:hidden;position:relative}
+  body::before{content:'';position:fixed;inset:0;
+    background-image:linear-gradient(rgba(0,245,160,.03) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,245,160,.03) 1px,transparent 1px);
+    background-size:40px 40px;pointer-events:none;z-index:0}
+  body::after{content:'';position:fixed;inset:0;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,
+      rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px);
+    pointer-events:none;z-index:0}
 
-  .screen{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:36px 24px;z-index:1;text-align:center;animation:fi .5s ease;width:100%}
+  .screen{display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:22px;padding:32px 24px;z-index:1;text-align:center;animation:fi .5s ease;width:100%}
   @keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  .logo{font-family:'Orbitron',sans-serif;font-size:2.8rem;font-weight:900;letter-spacing:.18em;color:var(--accent);text-shadow:var(--glow)}
+
+  .logo{font-family:'Orbitron',sans-serif;font-size:2.8rem;font-weight:900;
+    letter-spacing:.18em;color:var(--accent);text-shadow:var(--glow)}
   .logo span{color:var(--accent2);text-shadow:var(--glow2)}
-  .stitle{font-family:'Orbitron',sans-serif;font-size:.95rem;letter-spacing:.14em;opacity:.85}
-  .ssub{font-size:.74rem;color:var(--muted);letter-spacing:.05em;line-height:1.8;max-width:300px}
+  .stitle{font-family:'Orbitron',sans-serif;font-size:.92rem;letter-spacing:.14em;opacity:.85}
+  .ssub{font-size:.73rem;color:var(--muted);line-height:1.8;max-width:310px}
 
-  .cta{background:transparent;border:2px solid var(--accent);color:var(--accent);font-family:'Orbitron',sans-serif;font-size:.82rem;letter-spacing:.15em;padding:13px 36px;cursor:pointer;position:relative;overflow:hidden;transition:color .2s,box-shadow .2s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
-  .cta::before{content:'';position:absolute;inset:0;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s ease;z-index:-1}
-  .cta:hover{color:#000;box-shadow:var(--glow)}.cta:hover::before{transform:scaleX(1)}.cta:active{transform:scale(.96)}.cta:disabled{opacity:.35;cursor:not-allowed}
+  .cta{background:transparent;border:2px solid var(--accent);color:var(--accent);
+    font-family:'Orbitron',sans-serif;font-size:.8rem;letter-spacing:.15em;
+    padding:13px 34px;cursor:pointer;position:relative;overflow:hidden;
+    transition:color .2s,box-shadow .2s;
+    clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
+  .cta::before{content:'';position:absolute;inset:0;background:var(--accent);
+    transform:scaleX(0);transform-origin:left;transition:transform .25s ease;z-index:-1}
+  .cta:hover{color:#000;box-shadow:var(--glow)}.cta:hover::before{transform:scaleX(1)}
+  .cta:active{transform:scale(.96)}.cta:disabled{opacity:.35;cursor:not-allowed}
 
-  .spinner{width:54px;height:54px;border:3px solid var(--accent2);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;box-shadow:var(--glow2)}
+  .spinner{width:52px;height:52px;border:3px solid var(--accent2);
+    border-top-color:transparent;border-radius:50%;
+    animation:spin 1s linear infinite;box-shadow:var(--glow2)}
   @keyframes spin{to{transform:rotate(360deg)}}
   .pulse-row{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.7rem}
-  .pdot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:var(--glow);animation:pulse 1.2s infinite}
+  .pdot{width:9px;height:9px;border-radius:50%;background:var(--accent);
+    box-shadow:var(--glow);animation:pulse 1.2s infinite}
   @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.55)}}
 
   /* Setup */
-  .field{display:flex;flex-direction:column;gap:7px;width:100%;max-width:330px}
-  .field label{font-size:.62rem;color:var(--muted);letter-spacing:.1em}
-  .field input{background:var(--panel);border:1.5px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.78rem;padding:10px 14px;width:100%;outline:none;transition:border-color .2s}
-  .field input:focus{border-color:var(--accent)}
-  .hint{font-size:.59rem;color:var(--muted);line-height:1.75;max-width:310px}
-  .hint a{color:var(--accent2)}.hint code{background:var(--panel);padding:1px 5px;border:1px solid var(--border);font-size:.58rem;word-break:break-all}
+  .field{display:flex;flex-direction:column;gap:7px;width:100%;max-width:340px}
+  .field label{font-size:.61rem;color:var(--muted);letter-spacing:.1em}
+  .field input,.field select{background:var(--panel);border:1.5px solid var(--border);
+    color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.76rem;
+    padding:10px 13px;width:100%;outline:none;transition:border-color .2s;
+    -webkit-appearance:none}
+  .field input:focus,.field select:focus{border-color:var(--accent)}
+  .hint{font-size:.59rem;color:var(--muted);line-height:1.8;max-width:320px;text-align:left}
+  .hint a{color:var(--accent2)}.hint b{color:var(--text)}
+  .hint code{background:var(--panel);padding:2px 6px;border:1px solid var(--border);
+    font-size:.57rem;word-break:break-all;display:inline-block;margin:2px 0}
+  .err{color:var(--danger);font-size:.7rem;min-height:1em}
 
   /* Controller */
-  #ctrlScreen{display:none;flex-direction:column;align-items:center;justify-content:space-between;width:100%;max-width:420px;min-height:100dvh;padding:18px 20px 32px;z-index:1;gap:14px;animation:fi .4s ease}
+  #ctrlScreen{display:none;flex-direction:column;align-items:center;
+    justify-content:space-between;width:100%;max-width:420px;min-height:100dvh;
+    padding:18px 20px 32px;z-index:1;gap:14px;animation:fi .4s ease}
   .chdr{display:flex;align-items:center;justify-content:space-between;width:100%}
-  .ctitle{font-family:'Orbitron',sans-serif;font-size:.68rem;letter-spacing:.2em;color:var(--accent);text-shadow:var(--glow)}
-  .clive{display:flex;align-items:center;gap:6px;font-size:.63rem;color:var(--muted)}
-  .clive .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:var(--glow);animation:pulse 1.5s infinite}
-  .cbody{display:flex;align-items:center;justify-content:space-between;width:100%;flex:1;padding:0 8px}
+  .ctitle{font-family:'Orbitron',sans-serif;font-size:.68rem;letter-spacing:.2em;
+    color:var(--accent);text-shadow:var(--glow)}
+  .clive{display:flex;align-items:center;gap:6px;font-size:.62rem;color:var(--muted)}
+  .clive .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);
+    box-shadow:var(--glow);animation:pulse 1.5s infinite}
+  .cbody{display:flex;align-items:center;justify-content:space-between;
+    width:100%;flex:1;padding:0 8px}
 
   .dpad{position:relative;width:150px;height:150px;flex-shrink:0}
-  .dp{position:absolute;background:var(--btn-bg);border:1.5px solid var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .08s,box-shadow .08s,color .08s}
-  .dp.pressed{background:var(--accent);color:#000;box-shadow:var(--glow);border-color:var(--accent)}
+  .dp{position:absolute;background:var(--btn-bg);border:1.5px solid var(--border);
+    color:var(--muted);display:flex;align-items:center;justify-content:center;
+    cursor:pointer;user-select:none;-webkit-user-select:none;
+    transition:background .07s,box-shadow .07s,color .07s}
+  .dp.on{background:var(--accent);color:#000;box-shadow:var(--glow);border-color:var(--accent)}
   .dp-u,.dp-d{width:50px;height:50px;left:50px}
   .dp-l,.dp-r{width:50px;height:50px;top:50px}
-  .dp-u{top:0;clip-path:polygon(0 15%,50% 0,100% 15%,100% 100%,0 100%)}
+  .dp-u{top:0;    clip-path:polygon(0 15%,50% 0,100% 15%,100% 100%,0 100%)}
   .dp-d{top:100px;clip-path:polygon(0 0,100% 0,100% 85%,50% 100%,0 85%)}
-  .dp-l{left:0;clip-path:polygon(0 50%,15% 0,100% 0,100% 100%,15% 100%)}
+  .dp-l{left:0;   clip-path:polygon(0 50%,15% 0,100% 0,100% 100%,15% 100%)}
   .dp-r{left:100px;clip-path:polygon(0 0,85% 0,100% 50%,85% 100%,0 100%)}
-  .dp-c{position:absolute;top:50px;left:50px;width:50px;height:50px;background:var(--border);display:flex;align-items:center;justify-content:center}
+  .dp-c{position:absolute;top:50px;left:50px;width:50px;height:50px;
+    background:var(--border);display:flex;align-items:center;justify-content:center}
   .dp-cd{width:8px;height:8px;border-radius:50%;background:var(--muted)}
   .asv{width:18px;height:18px;fill:currentColor;pointer-events:none}
 
-  .btnA{width:86px;height:86px;border-radius:50%;background:var(--btn-bg);border:2.5px solid var(--danger);color:var(--danger);font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .08s,box-shadow .08s,color .08s;box-shadow:0 0 0 6px rgba(255,45,85,.08)}
-  .btnA.pressed{background:var(--danger);color:#fff;box-shadow:0 0 24px rgba(255,45,85,.7)}
+  .btnA{width:86px;height:86px;border-radius:50%;background:var(--btn-bg);
+    border:2.5px solid var(--danger);color:var(--danger);
+    font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;user-select:none;-webkit-user-select:none;
+    transition:background .07s,box-shadow .07s,color .07s;
+    box-shadow:0 0 0 6px rgba(255,45,85,.08)}
+  .btnA.on{background:var(--danger);color:#fff;box-shadow:0 0 24px rgba(255,45,85,.7)}
 
-  .ibox{width:100%;background:var(--panel);border:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)}
+  .ibox{width:100%;background:var(--panel);border:1px solid var(--border);
+    padding:10px 14px;display:flex;align-items:center;justify-content:space-between;
+    gap:8px;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%)}
   .ilbl{font-size:.6rem;color:var(--muted);letter-spacing:.1em}
-  .ival{font-size:.74rem;color:var(--accent);letter-spacing:.08em}
+  .ival{font-size:.73rem;color:var(--accent);letter-spacing:.08em}
   .cftr{width:100%;display:flex;justify-content:center}
-  .sbadge{font-size:.58rem;color:var(--muted);letter-spacing:.08em;opacity:.45}
+  .sbadge{font-size:.57rem;color:var(--muted);letter-spacing:.08em;opacity:.45}
 </style>
 </head>
 <body>
 
-<!-- SETUP -->
+<!-- ══ SETUP SCREEN ══════════════════════════════════════════ -->
 <div class="screen" id="setupScreen">
   <div class="logo">CTR<span>L</span></div>
   <div class="stitle">ONE-TIME SETUP</div>
-  <div class="field"><label>JSONBIN.IO — BIN ID</label><input id="iBinId" placeholder="6643f1aead19ca34f8..." autocomplete="off"/></div>
-  <div class="field"><label>API KEY (X-Master-Key)</label><input id="iApiKey" placeholder="$2b$10$..." type="password" autocomplete="off"/></div>
-  <button class="cta" onclick="saveSetup()">SAVE &amp; CONTINUE</button>
+
+  <div class="field">
+    <label>FIREBASE DATABASE URL</label>
+    <input id="iDbUrl" placeholder="https://YOUR-PROJECT-default-rtdb.firebaseio.com" autocomplete="off"/>
+  </div>
+
+  <div class="err" id="setupErr"></div>
+  <button class="cta" onclick="saveSetup()">TEST &amp; SAVE</button>
+
   <div class="hint">
-    1. Sign up free at <a href="https://jsonbin.io" target="_blank">jsonbin.io</a><br/>
-    2. Create a new bin with this JSON:<br/>
-    <code>{"sessionActive":false,"sessionTs":0,"sessionToken":null,"input":{"up":false,"down":false,"left":false,"right":false,"a":false}}</code><br/>
-    3. Paste the Bin ID and your Master Key above.<br/>
-    Also paste the same BIN_ID and API_KEY into <b>WebController.cs</b>.
+    <b>Free Firebase setup (2 min):</b><br/>
+    1. Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a><br/>
+    2. <b>Add project</b> → give it any name → continue<br/>
+    3. Left menu → <b>Build → Realtime Database → Create Database</b><br/>
+    4. Choose <i>Start in test mode</i> (allows read/write for 30 days — enough to test)<br/>
+    5. Copy the URL shown (looks like <code>https://myproject-default-rtdb.firebaseio.com</code>)<br/>
+    6. Paste it above and press SAVE.<br/><br/>
+    Also paste the same URL into <b>WebController.cs</b> in Unity.
   </div>
 </div>
 
-<!-- START -->
+<!-- ══ START SCREEN ══════════════════════════════════════════ -->
 <div class="screen" id="startScreen" style="display:none">
   <div class="logo">CTR<span>L</span></div>
   <div class="stitle">REMOTE CONTROLLER</div>
-  <div class="ssub">Use your phone as a game controller over the internet.</div>
+  <div class="ssub">Use your phone as a wireless game controller.</div>
   <button class="cta" id="startBtn" onclick="tryStart()">▶ START GAME</button>
-  <div class="ssub" id="checkMsg" style="display:none;color:var(--accent2)">CHECKING...</div>
+  <div class="ssub" id="checkMsg" style="display:none;color:var(--accent2)">CHECKING SESSION...</div>
+  <div class="err" id="startErr"></div>
 </div>
 
-<!-- WAIT -->
+<!-- ══ WAIT SCREEN ═══════════════════════════════════════════ -->
 <div class="screen" id="waitScreen" style="display:none">
   <div class="logo">CTR<span>L</span></div>
   <div class="spinner"></div>
   <div class="stitle">SESSION OCCUPIED</div>
-  <div class="ssub">Another player is in a session. You will be notified automatically when they finish.</div>
+  <div class="ssub">Another player is active. You will be redirected automatically when they finish.</div>
   <div class="pulse-row"><div class="pdot"></div>WAITING...</div>
 </div>
 
-<!-- CONTROLLER -->
+<!-- ══ CONTROLLER ════════════════════════════════════════════ -->
 <div id="ctrlScreen">
   <div class="chdr">
     <div class="ctitle">◈ CTRL — ACTIVE</div>
@@ -134,146 +187,203 @@
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════
-//  CONFIG — set once via setup screen, stored locally
-// ═══════════════════════════════════════════════════
-let BIN_ID  = localStorage.getItem('ctrl_bin') || '';
-let API_KEY = localStorage.getItem('ctrl_key') || '';
-const SESSION_TTL = 10000; // 10 s — heartbeat keeps this fresh
+// ═══════════════════════════════════════════════════════════
+//  FIREBASE REST API
+//  No SDK needed — Firebase Realtime DB has a plain HTTP API.
+//  URL pattern:  https://<project>-default-rtdb.firebaseio.com/<path>.json
+// ═══════════════════════════════════════════════════════════
 
-// ── JSONbin API ─────────────────────────────────────
-const binUrl = () => `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+const SESSION_TTL = 10000; // ms — heartbeat must refresh within this window
+const DB_PATH     = '/ctrl'; // node inside your Firebase DB
 
-async function readBin() {
-  const r = await fetch(binUrl() + '/latest', {
-    headers: { 'X-Master-Key': API_KEY, 'X-Bin-Meta': 'false' }
-  });
-  if (!r.ok) throw new Error('JSONbin read ' + r.status);
-  return r.json(); // already the record with X-Bin-Meta:false
+let DB_URL = localStorage.getItem('ctrl_fb_url') || '';
+
+function fbUrl(path) {
+  return DB_URL.replace(/\/$/, '') + path + '.json';
 }
 
-async function writeBin(obj) {
-  const r = await fetch(binUrl(), {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-    body: JSON.stringify(obj)
-  });
-  if (!r.ok) throw new Error('JSONbin write ' + r.status);
+async function fbRead(path) {
+  const r = await fetch(fbUrl(path));
+  if (!r.ok) throw new Error(`Firebase read ${r.status}: ${await r.text()}`);
+  return r.json(); // returns null if node doesn't exist
 }
 
-// ── Screen helper ───────────────────────────────────
-function show(id) {
-  ['setupScreen','startScreen','waitScreen','ctrlScreen'].forEach(s => {
-    document.getElementById(s).style.display = (s === id) ? 'flex' : 'none';
+async function fbWrite(path, data) {
+  const r = await fetch(fbUrl(path), {
+    method:  'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(data)
   });
+  if (!r.ok) throw new Error(`Firebase write ${r.status}: ${await r.text()}`);
+  return r.json();
 }
 
-// ═══════════════════════════════════════════════════
-//  UNITY DETECTION
-//  Unity polls: https://yourpage.html?unity=1
-//  The page responds with ONLY a JSON string.
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  UNITY DETECTION — ?unity=1 in URL
+//  Returns ONLY a JSON string, no HTML at all.
+// ═══════════════════════════════════════════════════════════
 const IS_UNITY = new URLSearchParams(location.search).has('unity');
 
 async function serveUnity() {
-  // Replace entire document with plain JSON
+  let out;
   try {
-    const record = await readBin();
-    const now   = Date.now();
-    const alive = record.sessionActive && (now - record.sessionTs) < SESSION_TTL;
-    const out = {
-      sessionActive: alive,
+    if (!DB_URL) throw new Error('DB_URL not configured');
+    const data = await fbRead(DB_PATH);
+    const now  = Date.now();
+    const alive = data && data.sessionActive && (now - (data.sessionTs || 0)) < SESSION_TTL;
+    out = {
+      sessionActive: !!alive,
       input: {
-        up:    !!record.input?.up,
-        down:  !!record.input?.down,
-        left:  !!record.input?.left,
-        right: !!record.input?.right,
-        a:     !!record.input?.a
+        up:    !!(alive && data.input?.up),
+        down:  !!(alive && data.input?.down),
+        left:  !!(alive && data.input?.left),
+        right: !!(alive && data.input?.right),
+        a:     !!(alive && data.input?.a)
       },
       timestamp: now
     };
-    document.open('text/plain');
-    document.write(JSON.stringify(out));
-    document.close();
   } catch(e) {
-    document.open('text/plain');
-    document.write(JSON.stringify({ error: e.message }));
-    document.close();
+    out = { error: e.message, sessionActive: false,
+            input: {up:false,down:false,left:false,right:false,a:false} };
+  }
+  // Replace entire document with plain JSON text
+  document.open('text/plain');
+  document.write(JSON.stringify(out));
+  document.close();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SCREEN HELPER
+// ═══════════════════════════════════════════════════════════
+function show(id) {
+  ['setupScreen','startScreen','waitScreen','ctrlScreen'].forEach(s => {
+    const el = document.getElementById(s);
+    el.style.display = (s === id) ? 'flex' : 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SETUP
+// ═══════════════════════════════════════════════════════════
+async function saveSetup() {
+  const url = document.getElementById('iDbUrl').value.trim().replace(/\/$/, '');
+  const errEl = document.getElementById('setupErr');
+  errEl.textContent = '';
+
+  if (!url.startsWith('https://') || !url.includes('firebaseio.com')) {
+    errEl.textContent = '✗ Must be a firebaseio.com URL';
+    return;
+  }
+
+  errEl.textContent = 'Testing connection...';
+  DB_URL = url;
+
+  try {
+    // Write a test value then read it back
+    await fetch(url + '/ctrl_test.json', {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ ok: true })
+    });
+    const r = await fetch(url + '/ctrl_test.json');
+    if (!r.ok) throw new Error('Read test failed ' + r.status);
+    const d = await r.json();
+    if (!d || !d.ok) throw new Error('Data mismatch');
+
+    // Initialise the ctrl node if empty
+    const existing = await fbRead(DB_PATH);
+    if (!existing) {
+      await fbWrite(DB_PATH, {
+        sessionActive: false, sessionTs: 0, sessionToken: null,
+        input: {up:false,down:false,left:false,right:false,a:false}
+      });
+    }
+
+    localStorage.setItem('ctrl_fb_url', url);
+    errEl.textContent = '';
+    show('startScreen');
+  } catch(e) {
+    errEl.textContent = '✗ ' + e.message;
+    DB_URL = '';
   }
 }
 
-// ═══════════════════════════════════════════════════
-//  SETUP SCREEN
-// ═══════════════════════════════════════════════════
-function saveSetup() {
-  const b = document.getElementById('iBinId').value.trim();
-  const k = document.getElementById('iApiKey').value.trim();
-  if (!b || !k) { alert('Fill in both fields.'); return; }
-  BIN_ID = b; API_KEY = k;
-  localStorage.setItem('ctrl_bin', b);
-  localStorage.setItem('ctrl_key', k);
-  show('startScreen');
-}
-
-// ═══════════════════════════════════════════════════
-//  SESSION LOGIC
-// ═══════════════════════════════════════════════════
-let hbTimer   = null;
-let waitTimer  = null;
-let myToken    = null;
-const inp = { up:false, down:false, left:false, right:false, a:false };
+// ═══════════════════════════════════════════════════════════
+//  SESSION
+// ═══════════════════════════════════════════════════════════
+let hbTimer  = null;
+let waitTimer = null;
+let myToken  = null;
+const inp = {up:false,down:false,left:false,right:false,a:false};
 
 async function tryStart() {
-  document.getElementById('startBtn').disabled = true;
-  document.getElementById('checkMsg').style.display = 'block';
+  const btn    = document.getElementById('startBtn');
+  const msg    = document.getElementById('checkMsg');
+  const errEl  = document.getElementById('startErr');
+  btn.disabled = true;
+  msg.style.display = 'block';
+  errEl.textContent = '';
+
   try {
-    const record = await readBin();
-    const now    = Date.now();
-    const alive  = record.sessionActive && (now - record.sessionTs) < SESSION_TTL;
+    const data  = await fbRead(DB_PATH);
+    const now   = Date.now();
+    const alive = data && data.sessionActive && (now - (data.sessionTs || 0)) < SESSION_TTL;
+
     if (alive) {
       show('waitScreen');
       startWaitPoll();
     } else {
       myToken = Math.random().toString(36).slice(2,8).toUpperCase();
-      await writeBin({ sessionActive:true, sessionTs:Date.now(), sessionToken:myToken,
-                       input:{up:false,down:false,left:false,right:false,a:false} });
+      await fbWrite(DB_PATH, {
+        sessionActive: true,
+        sessionTs:     Date.now(),
+        sessionToken:  myToken,
+        input:         {up:false,down:false,left:false,right:false,a:false}
+      });
       document.getElementById('sBadge').textContent = 'SESSION: ' + myToken;
       show('ctrlScreen');
       bindControls();
       startHb();
     }
   } catch(e) {
-    alert('Connection error: ' + e.message);
-    document.getElementById('startBtn').disabled = false;
-    document.getElementById('checkMsg').style.display = 'none';
+    btn.disabled = false;
+    msg.style.display = 'none';
+    errEl.textContent = '✗ ' + e.message;
   }
 }
 
 function startHb() {
   hbTimer = setInterval(async () => {
     try {
-      await writeBin({ sessionActive:true, sessionTs:Date.now(),
-                       sessionToken:myToken, input:{...inp} });
-      updateDisp();
-    } catch(e) {}
+      await fbWrite(DB_PATH, {
+        sessionActive: true,
+        sessionTs:     Date.now(),
+        sessionToken:  myToken,
+        input:         {...inp}
+      });
+      refreshDisp();
+    } catch(e) { /* retry next tick */ }
   }, 300);
+
   window.addEventListener('beforeunload', releaseSession);
 }
 
 async function releaseSession() {
   clearInterval(hbTimer);
   try {
-    await writeBin({ sessionActive:false, sessionTs:0, sessionToken:null,
-                     input:{up:false,down:false,left:false,right:false,a:false} });
+    await fbWrite(DB_PATH, {
+      sessionActive: false, sessionTs: 0, sessionToken: null,
+      input: {up:false,down:false,left:false,right:false,a:false}
+    });
   } catch(e) {}
 }
 
 function startWaitPoll() {
   waitTimer = setInterval(async () => {
     try {
-      const record = await readBin();
-      const now    = Date.now();
-      const alive  = record.sessionActive && (now - record.sessionTs) < SESSION_TTL;
+      const data  = await fbRead(DB_PATH);
+      const now   = Date.now();
+      const alive = data && data.sessionActive && (now - (data.sessionTs || 0)) < SESSION_TTL;
       if (!alive) {
         clearInterval(waitTimer);
         document.getElementById('startBtn').disabled = false;
@@ -284,51 +394,50 @@ function startWaitPoll() {
   }, 2500);
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  INPUT BINDING
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function bindControls() {
-  [
-    ['bUp','up'],['bDown','down'],['bLeft','left'],['bRight','right'],['bA','a']
-  ].forEach(([id, key]) => {
+  [['bUp','up'],['bDown','down'],['bLeft','left'],['bRight','right'],['bA','a']]
+  .forEach(([id, key]) => {
     const el = document.getElementById(id);
-    const dn = e => { e.preventDefault(); inp[key]=true;  el.classList.add('pressed'); };
-    const up = e => { e.preventDefault(); inp[key]=false; el.classList.remove('pressed'); };
+    const dn = e => { e.preventDefault(); inp[key]=true;  el.classList.add('on'); };
+    const up = e => { e.preventDefault(); inp[key]=false; el.classList.remove('on'); };
     el.addEventListener('touchstart',  dn, {passive:false});
     el.addEventListener('touchend',    up, {passive:false});
     el.addEventListener('touchcancel', up, {passive:false});
-    el.addEventListener('mousedown', dn);
-    el.addEventListener('mouseup',   up);
-    el.addEventListener('mouseleave',up);
+    el.addEventListener('mousedown',   dn);
+    el.addEventListener('mouseup',     up);
+    el.addEventListener('mouseleave',  up);
   });
 
   const km = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',KeyA:'a',Space:'a'};
   window.addEventListener('keydown', e => {
     const k=km[e.code]; if(!k) return; e.preventDefault(); inp[k]=true;
-    document.getElementById('b'+k[0].toUpperCase()+k.slice(1))?.classList.add('pressed');
+    document.getElementById('b'+k[0].toUpperCase()+k.slice(1))?.classList.add('on');
   });
   window.addEventListener('keyup', e => {
     const k=km[e.code]; if(!k) return; inp[k]=false;
-    document.getElementById('b'+k[0].toUpperCase()+k.slice(1))?.classList.remove('pressed');
+    document.getElementById('b'+k[0].toUpperCase()+k.slice(1))?.classList.remove('on');
   });
 }
 
-function updateDisp() {
-  const a = Object.entries(inp).filter(([,v])=>v).map(([k])=>k.toUpperCase()).join(' + ') || 'NONE';
+function refreshDisp() {
+  const a = Object.entries(inp).filter(([,v])=>v).map(([k])=>k.toUpperCase()).join('+') || 'NONE';
   document.getElementById('iDisp').textContent = a;
   const n = new Date();
   document.getElementById('iSent').textContent =
-    n.getHours().toString().padStart(2,'0')+':'+
-    n.getMinutes().toString().padStart(2,'0')+':'+
-    n.getSeconds().toString().padStart(2,'0');
+    String(n.getHours()).padStart(2,'0')+':'+
+    String(n.getMinutes()).padStart(2,'0')+':'+
+    String(n.getSeconds()).padStart(2,'0');
 }
 
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  BOOT
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 window.addEventListener('load', async () => {
   if (IS_UNITY) { await serveUnity(); return; }
-  show(!BIN_ID || !API_KEY ? 'setupScreen' : 'startScreen');
+  show(!DB_URL ? 'setupScreen' : 'startScreen');
 });
 </script>
 </body>
